@@ -177,8 +177,7 @@ public class BNPaymentHandler {
      * taken in by the constructor and two optional.
      */
     public static class BNPaymentBuilder {
-        private String baseUrl = "https://ironpoodle-prod-eu-west-1.aws.bambora.com/";
-//        private String baseUrl = "https://ironpoodle-test-eu-west-1.aws.bambora.com/";
+        private String baseUrl = "https://eu-native.bambora.com/";
         private boolean debug;
         private String apiToken;
         private Context context;
