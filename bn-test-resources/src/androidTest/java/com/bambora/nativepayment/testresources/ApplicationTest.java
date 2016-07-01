@@ -1,4 +1,4 @@
-package com.bambora.nativepayment;
+package com.bambora.nativepayment.testresources;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

@@ -1,16 +1,41 @@
+/*
+ * Copyright (c) 2016 Bambora ( http://bambora.com/ )
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 package com.bambora.nativepayment.services;
 
 import com.bambora.nativepayment.handlers.BNPaymentHandler;
+import com.bambora.nativepayment.interfaces.ICardRegistrationCallback;
 import com.bambora.nativepayment.interfaces.ITransactionListener;
 import com.bambora.nativepayment.logging.BNLog;
 import com.bambora.nativepayment.models.PaymentSettings;
 import com.bambora.nativepayment.models.TransactionResponse;
+import com.bambora.nativepayment.models.creditcard.CreditCard;
 import com.bambora.nativepayment.models.creditcard.RegistrationFormError;
+import com.bambora.nativepayment.models.creditcard.RegistrationFormSettings;
+import com.bambora.nativepayment.models.creditcard.RegistrationParams;
+import com.bambora.nativepayment.models.creditcard.RegistrationResponse;
 import com.bambora.nativepayment.network.ApiService;
 import com.bambora.nativepayment.network.Callback;
 import com.bambora.nativepayment.network.Request;
-import com.bambora.nativepayment.models.creditcard.RegistrationFormSettings;
-import com.bambora.nativepayment.models.creditcard.RegistrationResponse;
 import com.bambora.nativepayment.network.RequestError;
 import com.bambora.nativepayment.network.Response;
 
@@ -33,6 +58,13 @@ public class PaymentApiService extends ApiService {
                 .endpoint("hpp/")
                 .method(POST)
                 .body(formSettings);
+    }
+
+    public Request<CreditCard> authorizeCreditCard(RegistrationParams registrationParams) {
+        return new Request<>(this, CreditCard.class)
+                .endpoint("cardregistration/")
+                .method(POST)
+                .body(registrationParams);
     }
 
     /**
@@ -84,6 +116,37 @@ public class PaymentApiService extends ApiService {
                 public void onError(RequestError error) {
                     if (resultListener != null) {
                         resultListener.onError(RegistrationFormError.PAGE_LOAD_ERROR);
+                    }
+                }
+            });
+            return request;
+        }
+
+        /**
+         * Makes an API call to register a credit card with given parameters for recurring payments.
+         *
+         * @param registrationParams    {@link RegistrationParams} with encrypted card details
+         * @param callback              Result callback
+         */
+        public static Request registerCreditCard(RegistrationParams registrationParams, final ICardRegistrationCallback callback) {
+            Request<CreditCard> request = createService().authorizeCreditCard(registrationParams);
+            request.execute(new Callback<CreditCard>() {
+                @Override
+                public void onSuccess(Response<CreditCard> response) {
+                    if (callback != null) {
+                        CreditCard creditCard = response.getBody();
+                        if (creditCard != null) {
+                            callback.onRegistrationSuccess(creditCard);
+                        } else {
+                            callback.onRegistrationError();
+                        }
+                    }
+                }
+
+                @Override
+                public void onError(RequestError error) {
+                    if (callback != null) {
+                        callback.onRegistrationError();
                     }
                 }
             });

@@ -1,3 +1,25 @@
+/*
+ * Copyright (c) 2016 Bambora ( http://bambora.com/ )
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 package com.bambora.paymentdemo;
 
 import android.content.DialogInterface;
@@ -13,16 +35,14 @@ import com.bambora.nativepayment.models.creditcard.CreditCard;
 import com.bambora.nativepayment.models.creditcard.RegistrationFormError;
 import com.bambora.nativepayment.webview.CreditCardRegistrationWebView;
 
-public class RegisterCreditCardActivity extends AppCompatActivity implements CreditCardRegistrationWebView.IStateChangeListener {
-
-    private static final String FORM_CSS_URL = "http://ci.mobivending.com/CNP/example.css";
+public class HostedPaymentPageActivity extends AppCompatActivity implements CreditCardRegistrationWebView.IStateChangeListener {
 
     private CreditCardRegistrationWebView mWebView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_register_credit_card);
+        setContentView(R.layout.activity_hosted_payment_page);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -45,11 +65,10 @@ public class RegisterCreditCardActivity extends AppCompatActivity implements Cre
     private void setupView() {
         mWebView = (CreditCardRegistrationWebView) findViewById(R.id.register_credit_card_webview);
         mWebView.setStateChangeListener(this);
-        mWebView.setCssUrl(FORM_CSS_URL);
     }
 
     private void showDialog(String title, String message, final boolean navigateUp) {
-        final RegisterCreditCardActivity instance = this;
+        final HostedPaymentPageActivity instance = this;
 
         new AlertDialog.Builder(this)
                 .setTitle(title)

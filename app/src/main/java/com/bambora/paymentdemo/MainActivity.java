@@ -1,3 +1,25 @@
+/*
+ * Copyright (c) 2016 Bambora ( http://bambora.com/ )
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 package com.bambora.paymentdemo;
 
 import android.content.DialogInterface;
@@ -55,8 +77,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupView() {
-        Button registerCreditCardButton = (Button) findViewById(R.id.register_credit_card_button);
-        registerCreditCardButton.setOnClickListener(mRegisterCreditCardListener);
+        Button hppButton = (Button) findViewById(R.id.hpp_button);
+        hppButton.setOnClickListener(mHppButtonListener);
+
+        Button nativeRegistrationButton = (Button) findViewById(R.id.native_registration_button);
+        nativeRegistrationButton.setOnClickListener(mNativeRegistrationButtonListener);
 
         Button makeTransactionButton = (Button) findViewById(R.id.make_transaction_button);
         makeTransactionButton.setOnClickListener(mMakeTransactionListener);
@@ -65,9 +90,14 @@ public class MainActivity extends AppCompatActivity {
         listCreditCardsButton.setOnClickListener(mListCreditCardsListener);
     }
 
-    private void registerCreditCard() {
-        Intent i = new Intent(MainActivity.this, RegisterCreditCardActivity.class);
-        startActivity(i);
+    private void showHostedPaymentPage() {
+        Intent intent = new Intent(this, HostedPaymentPageActivity.class);
+        startActivity(intent);
+    }
+
+    private void showNativeCardRegistration() {
+        Intent intent = new Intent(this, NativeCardRegistrationActivity.class);
+        startActivity(intent);
     }
 
     private void makeTransaction(final PaymentSettings paymentSettings) {
@@ -107,13 +137,19 @@ public class MainActivity extends AppCompatActivity {
                 .show();
     }
 
-    Button.OnClickListener mRegisterCreditCardListener = new View.OnClickListener() {
+    Button.OnClickListener mHppButtonListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            registerCreditCard();
+            showHostedPaymentPage();
         }
     };
 
+    Button.OnClickListener mNativeRegistrationButtonListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            showNativeCardRegistration();
+        }
+    };
 
     Button.OnClickListener mMakeTransactionListener = new View.OnClickListener() {
         @Override

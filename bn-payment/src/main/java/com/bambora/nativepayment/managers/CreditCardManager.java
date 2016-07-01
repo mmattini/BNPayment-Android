@@ -1,10 +1,36 @@
+/*
+ * Copyright (c) 2016 Bambora ( http://bambora.com/ )
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 package com.bambora.nativepayment.managers;
 
 import android.content.Context;
 
+import com.bambora.nativepayment.interfaces.ICardRegistrationCallback;
+import com.bambora.nativepayment.models.creditcard.CreditCard;
+import com.bambora.nativepayment.models.creditcard.RegistrationParams;
+import com.bambora.nativepayment.models.creditcard.RegistrationParams.IOnEncryptionListener;
+import com.bambora.nativepayment.services.PaymentApiService;
 import com.bambora.nativepayment.storage.FileStorage;
 import com.bambora.nativepayment.storage.FileStorage.IOnObjectSaved;
-import com.bambora.nativepayment.models.creditcard.CreditCard;
 import com.bambora.nativepayment.storage.TransactionFileStorage;
 
 import java.io.Serializable;
@@ -19,6 +45,58 @@ import java.util.List;
 public class CreditCardManager {
 
     private TransactionFileStorage fileStorage = new TransactionFileStorage();
+
+    /**
+     * Registers a credit card with the given details for future recurring payments.
+     * <p>When card has been registered a truncated version of the card is saved to disk.</p>
+     *
+     * @param context       App Context object
+     * @param cardNumber    Card number
+     * @param expiryMonth   Expiry month of the card
+     * @param expiryYear    Expiry year of the card
+     * @param securityCode  Security code (CVC/CVV)
+     * @param listener      Result listener
+     */
+    public void registerCreditCard(final Context context, String cardNumber, String expiryMonth, String expiryYear,
+                                   String securityCode, final ICardRegistrationCallback listener) {
+        final RegistrationParams params = new RegistrationParams();
+        params.setParametersAndEncrypt(context, cardNumber, expiryMonth, expiryYear, securityCode,
+                new IOnEncryptionListener() {
+                    @Override
+                    public void onEncryptionComplete() {
+                        registerCreditCard(context, params, listener);
+                    }
+
+                    @Override
+                    public void onEncryptionError() {
+                        if (listener != null) listener.onRegistrationError();
+                    }
+                });
+    }
+
+    private void registerCreditCard(final Context context, RegistrationParams params,
+                                    final ICardRegistrationCallback listener) {
+        PaymentApiService.PaymentService.registerCreditCard(params, new ICardRegistrationCallback() {
+            @Override
+            public void onRegistrationSuccess(CreditCard creditCard) {
+                saveCreditCard(context, creditCard, new IOnCreditCardSaved() {
+                    @Override
+                    public void onCreditCardSaved(CreditCard creditCard) {
+                        if (listener != null) {
+                            listener.onRegistrationSuccess(creditCard);
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void onRegistrationError() {
+                if (listener != null) {
+                    listener.onRegistrationError();
+                }
+            }
+        });
+    }
 
     /**
      * Adds a credit card to existing stored credit cards.

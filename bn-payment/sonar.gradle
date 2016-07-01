@@ -1,0 +1,15 @@
+apply plugin: "sonar-runner"
+
+sonarRunner {
+    sonarProperties {
+        property "sonar.projectKey", System.getenv("SONAR_PROJECT_KEY") ?: ''
+        property "sonar.projectName", System.getenv("SONAR_NAME") ?: ''
+        property "sonar.projectVersion", android.defaultConfig.versionName
+        property "sonar.language", "java"
+        property "sonar.sources", "src"
+        property "sonar.binaries", "build"
+        property "sonar.host.url", System.getenv("SONAR_HOST_URL") ?: ''
+        property "sonar.login", System.getenv("SONAR_LOGIN") ?: ''
+        property "sonar.password", System.getenv("SONAR_PASSWORD") ?: ''
+    }
+}

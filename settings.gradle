@@ -1,1 +1,1 @@
-include ':app', ':bn-payment'
+include ':app', ':bn-payment', ':bn-test-resources'

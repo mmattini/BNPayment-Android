@@ -1,7 +1,28 @@
+/*
+ * Copyright (c) 2016 Bambora ( http://bambora.com/ )
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 package com.bambora.nativepayment.network;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.bambora.nativepayment.interfaces.ICredentialsObserver;
 import com.bambora.nativepayment.interfaces.IGetCredentialsCallback;
@@ -11,10 +32,8 @@ import com.bambora.nativepayment.models.UserModel;
 import com.bambora.nativepayment.services.CredentialsApiService.CredentialsService;
 import com.bambora.nativepayment.storage.FileStorage;
 import com.bambora.nativepayment.utils.DateUtils;
-import com.bambora.nativepayment.utils.HashUtils;
 
 import java.io.Serializable;
-import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -116,8 +135,6 @@ public class BNHttpClient extends HttpClient {
 
     /**
      * A method for generating an Auth header.
-     * The auth header consists protocol followed by app id, uuid and a hmac separated by ':'.
-     * The hmac itself i generated
      *
      * @param httpBody A UTF-8 String representation of the HTTP-body.
      * @param dateHeader The http date header field.
@@ -128,23 +145,15 @@ public class BNHttpClient extends HttpClient {
     private String generateAuthHeader(String httpBody, String dateHeader, String path, String query) {
         String authHeader = "";
         if (mCredentials != null) {
-
-            String stringToHash = mCredentials.getUuid()
-                    + ":" + httpBody
-                    + ":" + dateHeader
-                    + ":" + path
-                    + ":" + query;
-
-            String hmac = null;
-            try {
-                hmac = HashUtils.generateHmac("HmacSHA256", stringToHash, mCredentials.getSharedSecret());
-            } catch (GeneralSecurityException e) {
-                Log.w("", "Generating hmac failed: " + e);
-            }
-
-            authHeader = "MPS1 " + mCredentials.getUuid() + ":" + hmac;
+            RequestAuthenticator requestAuthenticator = new RequestAuthenticator(
+                    mCredentials,
+                    httpBody,
+                    dateHeader,
+                    path,
+                    query
+            );
+            authHeader = requestAuthenticator.generateRequestHeader();
         }
-
         return authHeader;
     }
 

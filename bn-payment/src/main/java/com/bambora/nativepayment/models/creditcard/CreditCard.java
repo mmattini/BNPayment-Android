@@ -1,11 +1,45 @@
+/*
+ * Copyright (c) 2016 Bambora ( http://bambora.com/ )
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 package com.bambora.nativepayment.models.creditcard;
+
+import com.bambora.nativepayment.interfaces.IJsonResponse;
+import com.bambora.nativepayment.logging.BNLog;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.Serializable;
 
 /**
  * @author Lovisa Corp
  */
-public class CreditCard implements Serializable {
+public class CreditCard implements Serializable, IJsonResponse<CreditCard> {
+
+    private static final String KEY_RECURRING_PAYMENT_ID = "recurringPaymentID";
+    private static final String KEY_CARD_NUMBER = "cardNumber";
+    private static final String KEY_CARD_TYPE = "cardType";
+    private static final String KEY_EXPIRY_MONTH = "expiryMonth";
+    private static final String KEY_EXPIRY_YEAR = "expiryYear";
 
     /**
      * Alias of the card
@@ -42,6 +76,8 @@ public class CreditCard implements Serializable {
      */
     private String creditCardToken;
 
+    public CreditCard() {}
+
     public CreditCard(String truncatedCardNumber, Integer expiryMonth, Integer expiryYear,
                       String paymentType, String transactionId, String creditCardToken) {
         this.truncatedCardNumber = truncatedCardNumber;
@@ -61,6 +97,26 @@ public class CreditCard implements Serializable {
             this.transactionId = registrationResult.transactionId;
             this.creditCardToken = registrationResult.subscriptionId;
         }
+    }
+
+    public CreditCard(JSONObject jsonObject) {
+        this.creditCardToken = jsonObject.optString(KEY_RECURRING_PAYMENT_ID);
+        this.truncatedCardNumber = jsonObject.optString(KEY_CARD_NUMBER);
+        this.paymentType = jsonObject.optString(KEY_CARD_TYPE);
+        this.expiryMonth = jsonObject.optInt(KEY_EXPIRY_MONTH);
+        this.expiryYear = jsonObject.optInt(KEY_EXPIRY_YEAR);
+    }
+
+    @Override
+    public CreditCard fromJson(String jsonString) throws JSONException {
+        JSONObject jsonObject;
+        try {
+            jsonObject = new JSONObject(jsonString);
+            return new CreditCard(jsonObject);
+        } catch (JSONException e) {
+            BNLog.jsonParseError(getClass().getSimpleName(), e);
+        }
+        return this;
     }
 
     public String getAlias() {

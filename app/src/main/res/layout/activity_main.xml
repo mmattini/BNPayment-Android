@@ -15,11 +15,19 @@
             android:orientation="vertical">
 
             <Button
-                android:id="@+id/register_credit_card_button"
+                android:id="@+id/hpp_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:text="Register credit card"
+                android:text="Hosted Payment Page"
+                android:padding="10dp" />
+
+            <Button
+                android:id="@+id/native_registration_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="Native Card Registration"
                 android:padding="10dp" />
 
             <Button

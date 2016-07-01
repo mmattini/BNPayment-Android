@@ -1,3 +1,25 @@
+/*
+ * Copyright (c) 2016 Bambora ( http://bambora.com/ )
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 package com.bambora.nativepayment.network;
 
 import com.bambora.nativepayment.interfaces.IJsonRequest;
@@ -162,7 +184,11 @@ public class Request<T extends IJsonResponse<T>> {
      * @return A JSON formatted {@link String} of the request body.
      */
     public String getRawBody() {
-        return body.getSerialized();
+        if (body != null) {
+            return body.getSerialized();
+        } else {
+            return null;
+        }
     }
 
     public boolean requiresAuthenticator() {
@@ -194,6 +220,7 @@ public class Request<T extends IJsonResponse<T>> {
      */
     @Override
     public String toString() {
+        final int maxBodySize = 500;
         StringBuilder builder = new StringBuilder();
         builder
                 .append("URL: ").append(getUrl()).append("\n")
@@ -202,9 +229,10 @@ public class Request<T extends IJsonResponse<T>> {
                 .append(header.toString());
         String rawBody = getRawBody();
         if (rawBody != null) {
+            String truncatedBody = rawBody.length() > maxBodySize ? rawBody.substring(0, maxBodySize) : rawBody;
             builder
-                    .append("Request body:\n")
-                    .append("\t\t").append(rawBody).append("\n");
+                    .append("Request body (first " + maxBodySize + " characters):\n")
+                    .append("\t\t").append(truncatedBody).append("\n");
         }
         return builder.toString();
     }

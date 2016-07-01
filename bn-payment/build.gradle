@@ -1,14 +1,14 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 22
-    buildToolsVersion "22.0.1"
+    compileSdkVersion 23
+    buildToolsVersion "23.0.3"
 
     defaultConfig {
         minSdkVersion 10
-        targetSdkVersion 22
+        targetSdkVersion 23
         versionCode = System.getenv("BUILD_NUMBER") as Integer ?: 0
-        versionName "1.0.2"
+        versionName "1.2.0"
     }
     buildTypes {
         release {
@@ -20,7 +20,14 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:22.2.0'
+    compile 'com.android.support:appcompat-v7:23.3.0'
 
+    testCompile 'commons-codec:commons-codec:1.9'
+    compile 'commons-codec:commons-codec:1.9'
     testCompile 'junit:junit:4.+'
+    androidTestCompile 'junit:junit:4+'
+    androidTestCompile 'com.android.support.test:runner:0.4'
 }
+
+apply from: "bintray.gradle"
+apply from: "sonar.gradle"
