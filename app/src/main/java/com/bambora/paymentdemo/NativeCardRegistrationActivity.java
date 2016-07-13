@@ -29,6 +29,7 @@ import android.widget.Toast;
 
 import com.bambora.nativepayment.interfaces.ICardRegistrationCallback;
 import com.bambora.nativepayment.models.creditcard.CreditCard;
+import com.bambora.nativepayment.network.RequestError;
 import com.bambora.nativepayment.widget.CardRegistrationFormLayout;
 
 /**
@@ -50,7 +51,7 @@ public class NativeCardRegistrationActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onRegistrationError() {
+    public void onRegistrationError(RequestError error) {
         Toast.makeText(this, "Card registration failed.", Toast.LENGTH_SHORT).show();
     }
 }

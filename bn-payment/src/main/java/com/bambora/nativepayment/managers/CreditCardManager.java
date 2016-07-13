@@ -28,6 +28,7 @@ import com.bambora.nativepayment.interfaces.ICardRegistrationCallback;
 import com.bambora.nativepayment.models.creditcard.CreditCard;
 import com.bambora.nativepayment.models.creditcard.RegistrationParams;
 import com.bambora.nativepayment.models.creditcard.RegistrationParams.IOnEncryptionListener;
+import com.bambora.nativepayment.network.RequestError;
 import com.bambora.nativepayment.services.PaymentApiService;
 import com.bambora.nativepayment.storage.FileStorage;
 import com.bambora.nativepayment.storage.FileStorage.IOnObjectSaved;
@@ -69,7 +70,7 @@ public class CreditCardManager {
 
                     @Override
                     public void onEncryptionError() {
-                        if (listener != null) listener.onRegistrationError();
+                        if (listener != null) listener.onRegistrationError(null);
                     }
                 });
     }
@@ -90,9 +91,9 @@ public class CreditCardManager {
             }
 
             @Override
-            public void onRegistrationError() {
+            public void onRegistrationError(RequestError error) {
                 if (listener != null) {
-                    listener.onRegistrationError();
+                    listener.onRegistrationError(error);
                 }
             }
         });

@@ -37,6 +37,7 @@ import com.bambora.nativepayment.interfaces.ITransactionListener;
 import com.bambora.nativepayment.managers.CreditCardManager;
 import com.bambora.nativepayment.models.PaymentSettings;
 import com.bambora.nativepayment.models.creditcard.CreditCard;
+import com.bambora.nativepayment.network.RequestError;
 
 import java.util.Date;
 import java.util.List;
@@ -105,16 +106,13 @@ public class MainActivity extends AppCompatActivity {
 //        String paymentId = "123456";
         BNPaymentHandler.getInstance().makeTransaction(paymentId, paymentSettings, new ITransactionListener() {
             @Override
-            public void onTransactionResult(TransactionResult result) {
-                switch (result) {
-                    case TRANSACTION_RESULT_SUCCESS:
-                        showDialog("Success", "The payment succeeded.");
-                        break;
+            public void onTransactionSuccess() {
+                showDialog("Success", "The payment succeeded.");
+            }
 
-                    default:
-                        showDialog("Failure", "The payment did not succeed.");
-                        break;
-                }
+            @Override
+            public void onTransactionError(RequestError error) {
+                showDialog("Failure", "The payment did not succeed.");
             }
         });
     }

@@ -138,7 +138,7 @@ public class PaymentApiService extends ApiService {
                         if (creditCard != null) {
                             callback.onRegistrationSuccess(creditCard);
                         } else {
-                            callback.onRegistrationError();
+                            callback.onRegistrationError(null);
                         }
                     }
                 }
@@ -146,7 +146,7 @@ public class PaymentApiService extends ApiService {
                 @Override
                 public void onError(RequestError error) {
                     if (callback != null) {
-                        callback.onRegistrationError();
+                        callback.onRegistrationError(error);
                     }
                 }
             });
@@ -157,8 +157,7 @@ public class PaymentApiService extends ApiService {
          * A method for making a transaction.
          *
          * @param paymentSettings {@link PaymentSettings} containing transaction details.
-         * @param listener A callback that returns {@link ITransactionListener.TransactionResult}
-         *                 indicating the result of the transaction.
+         * @param listener Result listener.
          */
         public static Request makeTransaction(String paymentId, PaymentSettings paymentSettings, final ITransactionListener listener) {
             Request<TransactionResponse> request = createService().makeTransaction(paymentId, paymentSettings);
@@ -166,14 +165,14 @@ public class PaymentApiService extends ApiService {
                 @Override
                 public void onSuccess(Response<TransactionResponse> response) {
                     if (listener != null) {
-                        listener.onTransactionResult(ITransactionListener.TransactionResult.TRANSACTION_RESULT_SUCCESS);
+                        listener.onTransactionSuccess();
                     }
                 }
 
                 @Override
                 public void onError(RequestError error) {
                     if (listener != null) {
-                        listener.onTransactionResult(ITransactionListener.TransactionResult.TRANSACTION_RESULT_FAILURE);
+                        listener.onTransactionError(error);
                     }
                 }
             });
