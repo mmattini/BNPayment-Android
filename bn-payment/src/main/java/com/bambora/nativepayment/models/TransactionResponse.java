@@ -23,8 +23,9 @@
 package com.bambora.nativepayment.models;
 
 import com.bambora.nativepayment.interfaces.IJsonResponse;
-import com.bambora.nativepayment.logging.BNLog;
+import com.bambora.nativepayment.json.JsonContainer;
 import com.bambora.nativepayment.models.creditcard.TransactionErrorResponse;
+import com.bambora.nativepayment.utils.JsonUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -61,20 +62,15 @@ public class TransactionResponse implements IJsonResponse<TransactionResponse> {
     public String errorInfo;
 
     @Override
-    public TransactionResponse fromJson(String jsonString) {
-        JSONObject jsonObject;
-        try {
-            jsonObject = new JSONObject(jsonString);
-            paymentId = jsonObject.optString(KEY_PAYMENT_ID);
-            amount = jsonObject.optInt(KEY_AMOUNT);
-            currency = jsonObject.optString(KEY_CURRENCY);
-            status = jsonObject.optInt(KEY_STATUS);
-            code = jsonObject.optInt(KEY_CODE);
-            errorMessage = jsonObject.optString(KEY_MESSAGE);
-            errorInfo = jsonObject.optString(KEY_INFO);
-        } catch (JSONException e) {
-            BNLog.jsonParseError(getClass().getSimpleName(), e);
-        }
+    public TransactionResponse fromJson(JsonContainer jsonContainer) throws JSONException {
+        JSONObject jsonObject = jsonContainer.getJsonObject();
+        paymentId = JsonUtils.getStringIfExists(jsonObject, KEY_PAYMENT_ID);
+        amount = JsonUtils.getIntIfExists(jsonObject, KEY_AMOUNT);
+        currency = JsonUtils.getStringIfExists(jsonObject, KEY_CURRENCY);
+        status = JsonUtils.getIntIfExists(jsonObject, KEY_STATUS);
+        code = JsonUtils.getIntIfExists(jsonObject, KEY_CODE);
+        errorMessage = JsonUtils.getStringIfExists(jsonObject, KEY_MESSAGE);
+        errorInfo = JsonUtils.getStringIfExists(jsonObject, KEY_INFO);
         return this;
     }
 

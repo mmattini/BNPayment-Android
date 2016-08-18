@@ -2,11 +2,16 @@ package com.bambora.nativepayment.security;
 
 import android.content.Context;
 
+import com.bambora.nativepayment.utils.CertificateUtils;
+
 import java.io.InputStream;
 import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * TODO
@@ -61,6 +66,14 @@ public class InstrumentationTestData {
 
     public static String getCertificateFromString() {
         return PUBLIC_TEST_CERT_AS_STRING;
+    }
+
+    public static List<EncryptionCertificate> getTestEncryptionCerts() {
+        List<EncryptionCertificate> certificates = new ArrayList<>();
+        X509Certificate certificate = (X509Certificate) CertificateUtils.parseCertificate(getCertificateFromString());
+        X509Certificate[] certificateArray = { certificate };
+        certificates.add(new EncryptionCertificate("TestFingerprint", certificateArray, null, 0));
+        return certificates;
     }
 
     private static KeyStore loadTestKeyStore(Context context) throws Exception {

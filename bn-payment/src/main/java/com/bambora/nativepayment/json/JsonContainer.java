@@ -20,36 +20,57 @@
  * THE SOFTWARE.
  */
 
-package com.bambora.nativepayment.models;
-
-import com.bambora.nativepayment.interfaces.IJsonResponse;
-import com.bambora.nativepayment.json.JsonContainer;
-import com.bambora.nativepayment.security.EncryptionCertificate;
+package com.bambora.nativepayment.json;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 
 /**
  * TODO
  */
-public class CertificatesResponse implements IJsonResponse<CertificatesResponse> {
+public class JsonContainer {
 
-    List<EncryptionCertificate> certificates = new ArrayList<>();
+    private Object json;
 
-    public List<EncryptionCertificate> getEncryptionCertificates() {
-        return certificates;
+    public JsonContainer(String jsonString) throws JSONException {
+        json = new JSONTokener(jsonString).nextValue();
     }
 
-    @Override
-    public CertificatesResponse fromJson(JsonContainer jsonContainer) throws JSONException {
-        JSONArray jsonArray = jsonContainer.getJsonArray();
-        for (int i = 0; i < jsonArray.length(); i++) {
-            EncryptionCertificate certificate = new EncryptionCertificate(jsonArray.optJSONObject(i));
-            certificates.add(certificate);
+    public JsonContainer(JSONObject jsonObject) {
+        this.json = jsonObject;
+    }
+
+    public JsonContainer(JSONArray jsonArray) {
+        this.json = jsonArray;
+    }
+
+    public boolean isJsonObject() {
+        if (this.json instanceof JSONObject) {
+            return true;
         }
-        return this;
+        return false;
+    }
+
+    public boolean isJsonArray() {
+        if (this.json instanceof JSONArray) {
+            return true;
+        }
+        return false;
+    }
+
+    public JSONObject getJsonObject() throws JSONException {
+        if (isJsonObject()) {
+            return (JSONObject) this.json;
+        }
+        throw new JSONException("Expected JSONObject but was " + (json != null ? json.getClass() : "null"));
+    }
+
+    public JSONArray getJsonArray() throws JSONException {
+        if (isJsonArray()) {
+            return (JSONArray) this.json;
+        }
+        throw new JSONException("Expected JSONArray but was " + (json != null ? json.getClass() : "null"));
     }
 }

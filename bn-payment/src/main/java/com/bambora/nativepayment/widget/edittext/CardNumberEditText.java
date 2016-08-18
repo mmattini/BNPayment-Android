@@ -34,7 +34,8 @@ import com.bambora.nativepayment.widget.textwatcher.CardNumberTextWatcher;
 import com.bambora.nativepayment.widget.textwatcher.CardNumberTextWatcher.CardTypeListener;
 
 /**
- * TODO
+ * A custom {@link android.widget.EditText} for card number input. It handles live formatting and
+ * validation.
  */
 public class CardNumberEditText extends CardFormEditText implements CardTypeListener {
 
@@ -67,7 +68,7 @@ public class CardNumberEditText extends CardFormEditText implements CardTypeList
     }
 
     @Override
-    public Integer getMaxLength() {
+    public Integer getDefaultMaxLength() {
         return MAX_LENGTH;
     }
 
@@ -84,5 +85,6 @@ public class CardNumberEditText extends CardFormEditText implements CardTypeList
                 ? CompatHelper.getDrawable(getContext(), iconResId, null)
                 : null;
         setCompoundDrawablesWithIntrinsicBounds(null, null, iconDrawable, null);
+        setMaxLengthFilter(cardNumberFormat.getMaxInputLength());
     }
 }

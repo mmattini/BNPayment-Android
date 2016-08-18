@@ -23,6 +23,7 @@
 package com.bambora.nativepayment.models.creditcard;
 
 import com.bambora.nativepayment.models.creditcard.RegistrationResultAction.ActionCode;
+import com.bambora.nativepayment.utils.JsonUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -82,14 +83,15 @@ public class RegistrationResult {
     public final String originIp;
 
     public RegistrationResult(JSONObject jsonObject) throws JSONException {
-        meta = new RegistrationResultMeta(jsonObject.getJSONObject(KEY_META));
-        truncatedCardNumber = jsonObject.optString(KEY_CARD_NUMBER);
-        expiryMonth = jsonObject.optInt(KEY_EXPIRY_MONTH);
-        expiryYear = jsonObject.optInt(KEY_EXPIRY_YEAR);
-        paymentType = jsonObject.optString(KEY_PAYMENT_TYPE);
-        transactionId = jsonObject.optString(KEY_TRANSACTION_ID);
-        subscriptionId = jsonObject.optString(KEY_SUBSCRIPTION_ID);
-        originIp = jsonObject.optString(KEY_ORIGIN_IP);
+        JSONObject metaJson = JsonUtils.getJSONObjectIfExists(jsonObject, KEY_META);
+        meta = metaJson != null ? new RegistrationResultMeta(metaJson) : null;
+        truncatedCardNumber = JsonUtils.getStringIfExists(jsonObject, KEY_CARD_NUMBER);
+        expiryMonth = JsonUtils.getIntIfExists(jsonObject,KEY_EXPIRY_MONTH);
+        expiryYear = JsonUtils.getIntIfExists(jsonObject, KEY_EXPIRY_YEAR);
+        paymentType = JsonUtils.getStringIfExists(jsonObject, KEY_PAYMENT_TYPE);
+        transactionId = JsonUtils.getStringIfExists(jsonObject, KEY_TRANSACTION_ID);
+        subscriptionId = JsonUtils.getStringIfExists(jsonObject, KEY_SUBSCRIPTION_ID);
+        originIp = JsonUtils.getStringIfExists(jsonObject, KEY_ORIGIN_IP);
     }
 
     public static RegistrationResult fromJson(String jsonString) throws JSONException {

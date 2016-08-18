@@ -46,8 +46,6 @@ public class HostedPaymentPageActivity extends AppCompatActivity implements Cred
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        // Setup BNPaymentHandler
-
         setupView();
     }
 

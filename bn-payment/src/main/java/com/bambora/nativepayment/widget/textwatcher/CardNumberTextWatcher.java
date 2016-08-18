@@ -29,22 +29,14 @@ import com.bambora.nativepayment.widget.CardInputValidator;
 import com.bambora.nativepayment.widget.CardNumberFormat;
 import com.bambora.nativepayment.widget.FormInputHelper;
 
-import static com.bambora.nativepayment.widget.CardNumberFormat.CardType.MASTERCARD;
-import static com.bambora.nativepayment.widget.CardNumberFormat.CardType.VISA;
-
 /**
- * TODO
+ * A custom {@link TextWatcher} for formatting input as a card number.
  */
 public class CardNumberTextWatcher implements TextWatcher {
 
     private static final char SPACE = ' ';
 
-    private CardNumberFormat[] validFormats = {
-            new CardNumberFormat(VISA, "^4[0-9]{12}(?:[0-9]{3})?$", "^4\\d*", CardNumberFormat.FORMAT_GROUP_BY_4),
-            new CardNumberFormat(MASTERCARD, "^5[1-5][0-9]{14}$", "^5[1-5]\\d*", CardNumberFormat.FORMAT_GROUP_BY_4)
-    };
-
-    private CardNumberFormat numberFormat = CardNumberFormat.defaultFormat();
+    private CardNumberFormat numberFormat = new CardNumberFormat();
     private boolean deleting;
     private CharSequence deleted;
     private int startIndex;
@@ -55,7 +47,6 @@ public class CardNumberTextWatcher implements TextWatcher {
     public CardNumberTextWatcher(CardInputValidator inputFormatter, CardTypeListener cardTypeListener) {
         this.validator = inputFormatter;
         this.cardTypeListener = cardTypeListener;
-        validator.setFormatPattern(numberFormat.getFormatString());
         validator.setValidationPattern(numberFormat.getValidationString());
     }
 
@@ -68,38 +59,31 @@ public class CardNumberTextWatcher implements TextWatcher {
 
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count) {
-        numberFormat = guessCardNumberFormat(s);
+        updateCardType(s);
     }
 
     @Override
     public void afterTextChanged(Editable s) {
-        validator.setFormatPattern(numberFormat.getFormatString());
         validator.setValidationPattern(numberFormat.getValidationString());
         if (deleting && deleted.equals(String.valueOf(SPACE)) && s.length() > 0) {
             s.delete(startIndex -1, startIndex);
         }
-        if (!validator.isFormatted()) {
-            CharSequence formatted = FormInputHelper.formatNumberSequence(s.toString(), 4, SPACE);
+        if (!FormInputHelper.isFormatted(s.toString(), SPACE, numberFormat.getFormatGroupSizes())) {
+            CharSequence formatted = FormInputHelper.formatNumberSequence(s.toString(), numberFormat.getFormatGroupSizes(), SPACE);
             s.replace(0, s.length(), formatted);
         }
     }
 
-    private CardNumberFormat guessCardNumberFormat(CharSequence input) {
-        CardNumberFormat newFormat = CardNumberFormat.defaultFormat();
-        for (CardNumberFormat format : validFormats) {
-            if (format.possibleMatch(input)) {
-                newFormat = format;
-                break;
-            }
+    private void updateCardType(CharSequence input) {
+        boolean updated = numberFormat.updateCardType(input);
+        if (updated) {
+            notifyTypeChanged();
         }
-        notifyIfTypeChanged(newFormat);
-        return newFormat;
     }
 
-    private void notifyIfTypeChanged(CardNumberFormat newFormat) {
-        if (cardTypeListener == null) return;
-        if (numberFormat != null && newFormat.getCardType() != numberFormat.getCardType()) {
-           cardTypeListener.onCardTypeChanged(newFormat);
+    private void notifyTypeChanged() {
+        if (cardTypeListener != null) {
+            cardTypeListener.onCardTypeChanged(numberFormat);
         }
     }
 

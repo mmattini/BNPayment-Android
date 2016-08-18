@@ -22,6 +22,8 @@
 
 package com.bambora.nativepayment.widget;
 
+import java.util.List;
+
 /**
  * TODO
  */
@@ -39,11 +41,11 @@ public class FormInputHelper {
         return deletingChars.toString();
     }
 
-    public static CharSequence formatNumberSequence(String sequence, int groupSize, char groupDelimiter) {
+    public static CharSequence formatNumberSequence(String sequence, List<Integer> groupSizes, char groupDelimiter) {
         sequence = clearNonDigits(sequence);
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < sequence.length() + 1; i++) {
-            if (shouldBeDelimiter(i, groupSize)) {
+            if (shouldBeDelimiter(i, groupSizes)) {
                 stringBuilder.append(String.valueOf(groupDelimiter));
             }
             if (i < sequence.length()) {
@@ -53,7 +55,39 @@ public class FormInputHelper {
         return stringBuilder;
     }
 
-    private static boolean shouldBeDelimiter(int index, int groupSize) {
-        return index > 0 && index % groupSize == 0;
+    public static boolean isFormatted(String sequence, char delimiter, List<Integer> groupSizes) {
+        int delimiterPosition;
+        int groupIndex = 0;
+        if (groupSizes.size() > 0) {
+            delimiterPosition = groupSizes.get(groupIndex);
+        } else {
+            return true;
+        }
+        for (int i = 0; i < sequence.length(); i++) {
+            if (i == delimiterPosition) {
+                if (sequence.charAt(i) != delimiter) {
+                    return false;
+                } else if (groupSizes.size() > groupIndex + 1) {
+                    groupIndex++;
+                    delimiterPosition += groupSizes.get(groupIndex) + 1;
+                }
+            } else {
+                if (sequence.charAt(i) == delimiter) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public static boolean shouldBeDelimiter(int index, List<Integer> groupSizes) {
+        int delimiterPosition = 0;
+        for (int i = 0; i < groupSizes.size(); i++) {
+            delimiterPosition += groupSizes.get(i);
+            if (index == delimiterPosition) {
+                return true;
+            }
+        }
+        return false;
     }
 }

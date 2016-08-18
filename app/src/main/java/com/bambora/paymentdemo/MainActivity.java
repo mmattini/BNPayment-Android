@@ -22,6 +22,7 @@
 
 package com.bambora.paymentdemo;
 
+import android.app.AlertDialog.Builder;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -37,6 +38,7 @@ import com.bambora.nativepayment.interfaces.ITransactionListener;
 import com.bambora.nativepayment.managers.CreditCardManager;
 import com.bambora.nativepayment.models.PaymentSettings;
 import com.bambora.nativepayment.models.creditcard.CreditCard;
+import com.bambora.paymentdemo.adapter.CardListAdapter;
 import com.bambora.nativepayment.network.RequestError;
 
 import java.util.Date;
@@ -44,7 +46,11 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String API_TOKEN = "<Replace with your token>";
+    /**
+     * This is a test merchant number that can be used for testing Native Payment.
+     * Please replace this with your own merchant number after signing up with Bambora.
+     */
+    private static final String MERCHANT_ACCOUNT = "T638003301";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,8 +60,8 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
 
         // Setup BNPaymentHandler
-        BNPaymentBuilder BNPaymentBuilder = new BNPaymentBuilder(getApplicationContext(),
-                API_TOKEN)
+        BNPaymentBuilder BNPaymentBuilder = new BNPaymentBuilder(getApplicationContext())
+                .merchantAccount(MERCHANT_ACCOUNT)
                 .debug(true);
 
         BNPaymentHandler.setupBNPayments(BNPaymentBuilder);
@@ -101,9 +107,13 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void makeTransaction(final PaymentSettings paymentSettings) {
+    private void makeTransaction(CreditCard creditCard) {
         String paymentId = "test-payment-" + new Date().getTime();
-//        String paymentId = "123456";
+        PaymentSettings paymentSettings = new PaymentSettings();
+        paymentSettings.amount = 100;
+        paymentSettings.currency = "SEK";
+        paymentSettings.comment = "This is a test transaction.";
+        paymentSettings.creditCardToken = creditCard.getCreditCardToken();
         BNPaymentHandler.getInstance().makeTransaction(paymentId, paymentSettings, new ITransactionListener() {
             @Override
             public void onTransactionSuccess() {
@@ -135,6 +145,20 @@ public class MainActivity extends AppCompatActivity {
                 .show();
     }
 
+    private void showCardListDialog(final List<CreditCard> creditCardList) {
+        CardListAdapter listAdapter = new CardListAdapter(MainActivity.this, creditCardList);
+        Builder builder = new Builder(MainActivity.this);
+        builder.setTitle("Select a card");
+        builder.setNegativeButton("Cancel", null);
+        builder.setAdapter(listAdapter, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                makeTransaction(creditCardList.get(which));
+            }
+        });
+        builder.create().show();
+    }
+
     Button.OnClickListener mHppButtonListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
@@ -156,12 +180,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onCreditCardRead(List<CreditCard> creditCards) {
                     if (creditCards != null && creditCards.size() > 0) {
-                        PaymentSettings paymentSettings = new PaymentSettings();
-                        paymentSettings.amount = 100;
-                        paymentSettings.currency = "SEK";
-                        paymentSettings.comment = "This is a test transaction.";
-                        paymentSettings.creditCardToken = creditCards.get(0).getCreditCardToken();
-                        makeTransaction(paymentSettings);
+                        showCardListDialog(creditCards);
                     } else {
                         showDialog("No credit card registered", "Please register a credit card in order to make a purchase.");
                     }

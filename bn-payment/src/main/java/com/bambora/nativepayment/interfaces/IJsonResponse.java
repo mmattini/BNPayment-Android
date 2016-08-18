@@ -22,11 +22,13 @@
 
 package com.bambora.nativepayment.interfaces;
 
+import com.bambora.nativepayment.json.JsonContainer;
+
 import org.json.JSONException;
 
 /**
  * Interface for parsing a model from a JSON string.
  */
 public interface IJsonResponse<T> {
-    T fromJson(String jsonString) throws JSONException;
+    T fromJson(JsonContainer jsonContainer) throws JSONException;
 }

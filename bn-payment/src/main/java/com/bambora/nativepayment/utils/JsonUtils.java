@@ -20,41 +20,25 @@
  * THE SOFTWARE.
  */
 
-package com.bambora.nativepayment.models.creditcard;
+package com.bambora.nativepayment.utils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * Hold meta data of the card registration session
- * @author Lovisa Corp
+ * TODO
  */
-public class RegistrationResultMeta {
+public class JsonUtils {
 
-    private static final String KEY_ACTION = "action";
-    private static final String KEY_MESSAGE = "message";
-    private static final String KEY_RESULT = "result";
+    public static String getStringIfExists(JSONObject jsonObject, String key) throws JSONException {
+        return jsonObject.has(key) ? jsonObject.getString(key) : null;
+    }
 
-    /**
-     * {@link RegistrationResultAction} object
-     */
-    public RegistrationResultAction action;
+    public static Integer getIntIfExists(JSONObject jsonObject, String key) throws JSONException {
+        return jsonObject.has(key) ? jsonObject.getInt(key) : null;
+    }
 
-    /**
-     * {@link RegistrationResultMessage} object
-     */
-    public RegistrationResultMessage message;
-
-    /**
-     * True if result is included
-     */
-    public Boolean result;
-
-    public RegistrationResultMeta(JSONObject jsonObject) throws JSONException {
-        if (jsonObject != null) {
-            this.action = new RegistrationResultAction(jsonObject.optJSONObject(KEY_ACTION));
-            this.message = new RegistrationResultMessage(jsonObject.optJSONObject(KEY_MESSAGE));
-            this.result = jsonObject.optBoolean(KEY_RESULT);
-        }
+    public static JSONObject getJSONObjectIfExists(JSONObject jsonObject, String key) throws JSONException {
+        return jsonObject.has(key) ? jsonObject.getJSONObject(key) : null;
     }
 }

@@ -23,6 +23,7 @@
 package com.bambora.nativepayment.network;
 
 import com.bambora.nativepayment.interfaces.IJsonResponse;
+import com.bambora.nativepayment.json.JsonContainer;
 import com.bambora.nativepayment.logging.BNLog;
 
 /**
@@ -128,7 +129,7 @@ public class Response<T extends IJsonResponse<T>> {
     private T parseBody(String json, Class<T> bodyClass) {
         try {
             T instance = bodyClass.getConstructor().newInstance();
-            return instance.fromJson(json);
+            return instance.fromJson(new JsonContainer(json));
         } catch (Exception exception) {
             BNLog.e(LOG_TAG, "Failed to parse JSON object " +
                     bodyClass.getSimpleName() + " from string.", exception);

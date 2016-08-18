@@ -28,13 +28,15 @@ import android.text.TextWatcher;
 import com.bambora.nativepayment.widget.CardInputValidator;
 import com.bambora.nativepayment.widget.FormInputHelper;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
- * TODO
+ * A custom {@link TextWatcher} for formatting input as a card expiry date.
  */
 public class ExpiryDateTextWatcher implements TextWatcher {
 
     private static final char DELIMITER = '/';
-    private static final String FORMAT = "(\\d{1,2}\\/\\d{0,2})|\\/\\d{1,2}|\\d";
     private static final String VALID_INPUT = "^(0[1-9]|1[0-2])\\d{2}$";
 
     private CardInputValidator formatter;
@@ -44,7 +46,6 @@ public class ExpiryDateTextWatcher implements TextWatcher {
 
     public ExpiryDateTextWatcher(CardInputValidator inputFormatter) {
         this.formatter = inputFormatter;
-        this.formatter.setFormatPattern(FORMAT);
         this.formatter.setValidationPattern(VALID_INPUT);
     }
 
@@ -66,8 +67,9 @@ public class ExpiryDateTextWatcher implements TextWatcher {
                 s.delete(startIndex - 1, startIndex);
             }
         }
-        if (!formatter.isFormatted()) {
-            formattedInput = FormInputHelper.formatNumberSequence(formattedInput, 2, DELIMITER).toString();
+        List<Integer> groupSizes = Arrays.asList(2, 2);
+        if (!FormInputHelper.isFormatted(s.toString(), DELIMITER, groupSizes)) {
+            formattedInput = FormInputHelper.formatNumberSequence(formattedInput, groupSizes, DELIMITER).toString();
             s.replace(0, s.length(), formattedInput);
         }
     }

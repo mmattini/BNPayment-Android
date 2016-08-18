@@ -23,7 +23,8 @@
 package com.bambora.nativepayment.models.creditcard;
 
 import com.bambora.nativepayment.interfaces.IJsonResponse;
-import com.bambora.nativepayment.logging.BNLog;
+import com.bambora.nativepayment.json.JsonContainer;
+import com.bambora.nativepayment.utils.JsonUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -38,14 +39,9 @@ public class RegistrationResponse implements IJsonResponse<RegistrationResponse>
     public String sessionUrl;
 
     @Override
-    public RegistrationResponse fromJson(String jsonString) {
-        JSONObject jsonObject;
-        try {
-            jsonObject = new JSONObject(jsonString);
-            sessionUrl = jsonObject.optString(KEY_SESSION_URL);
-        } catch (JSONException e) {
-            BNLog.jsonParseError(getClass().getSimpleName(), e);
-        }
+    public RegistrationResponse fromJson(JsonContainer jsonContainer) throws JSONException {
+        JSONObject jsonObject = jsonContainer.getJsonObject();
+        sessionUrl = JsonUtils.getStringIfExists(jsonObject, KEY_SESSION_URL);
         return this;
     }
 }

@@ -22,39 +22,44 @@
 
 package com.bambora.nativepayment.models.creditcard;
 
+import android.test.InstrumentationTestCase;
+
+import com.bambora.nativepayment.json.JsonContainer;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * Hold meta data of the card registration session
- * @author Lovisa Corp
+ * TODO
  */
-public class RegistrationResultMeta {
+public class RegistrationResponseInstrumentationTest extends InstrumentationTestCase {
 
-    private static final String KEY_ACTION = "action";
-    private static final String KEY_MESSAGE = "message";
-    private static final String KEY_RESULT = "result";
+    private static final String KEY_SESSION_URL = "session_url";
 
-    /**
-     * {@link RegistrationResultAction} object
-     */
-    public RegistrationResultAction action;
+    public void testFromJsonWithNoParameters() throws JSONException {
+        // Given
+        JsonContainer responseJson = new JsonContainer("{}");
+        RegistrationResponse registrationResponse = new RegistrationResponse();
 
-    /**
-     * {@link RegistrationResultMessage} object
-     */
-    public RegistrationResultMessage message;
+        // When
+        registrationResponse.fromJson(responseJson);
 
-    /**
-     * True if result is included
-     */
-    public Boolean result;
+        // Then
+        assertNull(registrationResponse.sessionUrl);
+    }
 
-    public RegistrationResultMeta(JSONObject jsonObject) throws JSONException {
-        if (jsonObject != null) {
-            this.action = new RegistrationResultAction(jsonObject.optJSONObject(KEY_ACTION));
-            this.message = new RegistrationResultMessage(jsonObject.optJSONObject(KEY_MESSAGE));
-            this.result = jsonObject.optBoolean(KEY_RESULT);
-        }
+    public void testFromJsonWithValidUrl() throws JSONException {
+        // Given
+        String url = "http://a.valid.url";
+        JSONObject responseJson = new JSONObject();
+        responseJson.put(KEY_SESSION_URL, url);
+        JsonContainer responseJsonContainer = new JsonContainer(responseJson);
+        RegistrationResponse registrationResponse = new RegistrationResponse();
+
+        // When
+        registrationResponse.fromJson(responseJsonContainer);
+
+        // Then
+        assertEquals(url, registrationResponse.sessionUrl);
     }
 }

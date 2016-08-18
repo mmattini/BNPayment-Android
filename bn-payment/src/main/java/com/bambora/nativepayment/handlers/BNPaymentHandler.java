@@ -33,6 +33,7 @@ import com.bambora.nativepayment.models.PaymentSettings;
 import com.bambora.nativepayment.models.creditcard.RegistrationFormSettings;
 import com.bambora.nativepayment.network.ApiService;
 import com.bambora.nativepayment.network.BNHttpClient;
+import com.bambora.nativepayment.network.HttpClient;
 import com.bambora.nativepayment.network.Request;
 import com.bambora.nativepayment.services.PaymentApiService;
 import com.bambora.nativepayment.services.PaymentApiService.PaymentService;
@@ -42,7 +43,7 @@ import java.lang.reflect.Constructor;
 /**
  * {@link BNPaymentHandler} handles the responsibilities of managing the authentication and
  * service creation. <br><br>
- *
+ * <p/>
  * Created by oskarhenriksson on 14/10/15.
  */
 
@@ -66,6 +67,11 @@ public class BNPaymentHandler {
     private String mApiToken;
 
     /**
+     * The merchant account that identifies the Application to the API.
+     */
+    private String mMerchantAccount;
+
+    /**
      * A boolean indicating whether setup is done.
      */
     private boolean mIsSetup;
@@ -77,10 +83,13 @@ public class BNPaymentHandler {
 
     private CreditCardManager creditCardManager = new CreditCardManager();
 
+    private CertificateManager certificateManager = CertificateManager.getInstance();
+
     /**
      * Empty constructor for {@link BNPaymentHandler}
      */
-    private BNPaymentHandler() {}
+    private BNPaymentHandler() {
+    }
 
     /**
      * This method is used for accessing the shared BNPaymentHandler.
@@ -101,18 +110,24 @@ public class BNPaymentHandler {
         if (!ourInstance.mIsSetup) {
             ourInstance.mBaseUrl = builder.baseUrl;
             ourInstance.mApiToken = builder.apiToken;
+            ourInstance.mMerchantAccount = builder.merchantAccount;
             ourInstance.mDebug = builder.debug;
             ourInstance.mIsSetup = true;
-            ourInstance.mHttpClient = new BNHttpClient(builder.context, builder.apiToken);
-            CertificateManager.getInstance().getEncryptionCertificates(builder.context, null);
+            if (ourInstance.mApiToken != null && !"".equals(ourInstance.mApiToken)) {
+                ourInstance.mHttpClient = new BNHttpClient(builder.context, builder.apiToken);
+            } else {
+                ourInstance.mHttpClient = new BNHttpClient(builder.merchantAccount);
+            }
+            ourInstance.certificateManager.getEncryptionCertificates(builder.context, null);
         }
     }
 
     /**
      * Initiates the hosted payment page for registering a credit card and returns the URL to the
      * page.
-     * @param formSettings  HPP form settings
-     * @param listener      Callback listener
+     *
+     * @param formSettings HPP form settings
+     * @param listener     Callback listener
      */
     public Request initiateHostedPaymentPage(RegistrationFormSettings formSettings, PaymentApiService.IHppResultListener listener) {
         return PaymentService.initiateHppRegistration(formSettings, listener);
@@ -123,12 +138,12 @@ public class BNPaymentHandler {
      * <p>When the registration is completed the card is stored on disk and can be read by calling
      * {@link #getRegisteredCreditCards(Context, CreditCardManager.IOnCreditCardRead)}.</p>
      *
-     * @param context       App Context object
-     * @param cardNumber    Card number
-     * @param expiryMonth   Expiry month of the card
-     * @param expiryYear    Expiry year of the card
-     * @param securityCode  Security code such as CVC or CVV code
-     * @param listener      Result listener
+     * @param context      App Context object
+     * @param cardNumber   Card number
+     * @param expiryMonth  Expiry month of the card
+     * @param expiryYear   Expiry year of the card
+     * @param securityCode Security code such as CVC or CVV code
+     * @param listener     Result listener
      */
     public void registerCreditCard(Context context, String cardNumber, String expiryMonth, String expiryYear,
                                    String securityCode, ICardRegistrationCallback listener) {
@@ -138,6 +153,7 @@ public class BNPaymentHandler {
 
     /**
      * Reads all stored credit cards from local storage asynchronously and notifies listener.
+     *
      * @param context  App Context object
      * @param listener Callback listener; called when list of cards have been loaded
      */
@@ -147,9 +163,10 @@ public class BNPaymentHandler {
 
     /**
      * Deletes a stored credit card with given token from local disk.
-     * @param context           App context object
-     * @param creditCardToken   Token for credit card to be deleted
-     * @param listener          Result listener
+     *
+     * @param context         App context object
+     * @param creditCardToken Token for credit card to be deleted
+     * @param listener        Result listener
      */
     public void deleteCreditCard(Context context, String creditCardToken, CreditCardManager.IOnCreditCardDeleted listener) {
         creditCardManager.deleteCreditCard(context, creditCardToken, listener);
@@ -157,10 +174,11 @@ public class BNPaymentHandler {
 
     /**
      * Updates credit card alias for card with given token.
-     * @param context   App Context object
-     * @param alias     Name/Alias for the card
-     * @param token     Credit card token
-     * @param listener  Status listener. Called when update is completed.
+     *
+     * @param context  App Context object
+     * @param alias    Name/Alias for the card
+     * @param token    Credit card token
+     * @param listener Status listener. Called when update is completed.
      */
     public void setCreditCardAlias(Context context, String alias, String token, CreditCardManager.IOnCreditCardSaved listener) {
         creditCardManager.setAlias(context, alias, token, listener);
@@ -168,6 +186,7 @@ public class BNPaymentHandler {
 
     /**
      * Makes a transaction as specified in {@link PaymentSettings}.
+     *
      * @param paymentIdentifier Identifier of the payment that this transaction refers to.
      * @param paymentSettings   Specifies details of this transaction.
      * @param callBack          Transaction result callback.
@@ -180,8 +199,8 @@ public class BNPaymentHandler {
      * Instantiates and initiates an {@link ApiService} with a base URL and a network client.
      * <p>The network client is used to customize all requests sent by the service.</p>
      *
-     * @param serviceClass  Class to be initiated. Must extend {@link ApiService}.
-     * @param <T>           Generic class to instantiate
+     * @param serviceClass Class to be initiated. Must extend {@link ApiService}.
+     * @param <T>          Generic class to instantiate
      * @return The initiated service class object.
      */
     public <T extends ApiService> T createService(Class<T> serviceClass) {
@@ -200,9 +219,21 @@ public class BNPaymentHandler {
      * Returns the api-token registered to the handler instance.
      *
      * @return The app id used by the {@link BNPaymentHandler}.
+     * @deprecated As of release 1.4.0, replaced by {@link #getMerchantAccount()}
      */
+    @Deprecated
     public String getApiToken() {
         return mApiToken;
+    }
+
+    /**
+     * Returns the merchant account registered to the handler instance.
+     *
+     * @return The merchant account used by the {@link BNPaymentHandler}.
+     * @since 1.4.0
+     */
+    public String getMerchantAccount() {
+        return mMerchantAccount;
     }
 
     /**
@@ -215,26 +246,74 @@ public class BNPaymentHandler {
     }
 
     /**
+     * A getter for the http client
+     *
+     * @return The http client
+     */
+    public HttpClient getHttpClient() {
+        return mHttpClient;
+    }
+
+    /**
+     * Override the default {@link CertificateManager}.
+     * @param certificateManager A {@link CertificateManager}
+     */
+    public void setCertificateManager(CertificateManager certificateManager) {
+        ourInstance.certificateManager = certificateManager;
+    }
+
+    /**
+     * Removes current setup so that {@link #setupBNPayments(BNPaymentBuilder)} can be rerun.
+     */
+    public void clearSetup() {
+        ourInstance = new BNPaymentHandler();
+    }
+
+    /**
      * {@link BNPaymentBuilder} is a class used
-     * for building and instance of {@link BNPaymentHandler}. There are three required params
-     * taken in by the constructor and two optional.
+     * for building and instance of {@link BNPaymentHandler}.
      */
     public static class BNPaymentBuilder {
         private String baseUrl = "https://eu-native.bambora.com/";
         private boolean debug;
         private String apiToken;
+        private String merchantAccount;
         private Context context;
 
         /**
          * Constructor for {@link BNPaymentBuilder}
          * that takes the required params.
          *
-         * @param context The context in which the handler will operate (Should be the application context)
+         * @param context  The context in which the handler will operate (Should be the application context)
          * @param apiToken The app id for this application
+         * @deprecated As of version 1.4.0, use {@link BNPaymentBuilder(Context)} and {@link #merchantAccount(String)}
          */
+        @Deprecated
         public BNPaymentBuilder(Context context, String apiToken) {
             this.context = context;
             this.apiToken = apiToken;
+        }
+
+        /**
+         * Constructor for {@link BNPaymentBuilder}
+         * that takes the required params.
+         *
+         * @param context The context in which the handler will operate (Should be the application context)
+         */
+        public BNPaymentBuilder(Context context) {
+            this.context = context;
+        }
+
+        /**
+         * A method for setting the merchant account for the builder.
+         *
+         * @param merchantAccount The merchant account to use, e.g. "T012345678"
+         * @return The builder with merchant account set
+         * @since 1.4.0
+         */
+        public BNPaymentBuilder merchantAccount(String merchantAccount) {
+            this.merchantAccount = merchantAccount;
+            return this;
         }
 
         /**

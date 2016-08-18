@@ -73,8 +73,6 @@ public class Request<T extends IJsonResponse<T>> {
      */
     private IJsonRequest body;
 
-    private boolean requireAuthenticator = true;
-
     public Request(ApiService service, Class<T> responseClass) {
         this.service = service;
         this.responseClass = responseClass;
@@ -83,7 +81,7 @@ public class Request<T extends IJsonResponse<T>> {
     /**
      * Sets the endpoint path.
      *
-     * @param endpoint  Request endpoint path
+     * @param endpoint Request endpoint path
      * @return This {@link Request}
      */
     public Request<T> endpoint(String endpoint) {
@@ -109,7 +107,7 @@ public class Request<T extends IJsonResponse<T>> {
     /**
      * Sets the request method.
      *
-     * @param method    A REST request method
+     * @param method A REST request method
      * @return This {@link Request}
      */
     public Request<T> method(RequestMethod method) {
@@ -132,16 +130,11 @@ public class Request<T extends IJsonResponse<T>> {
     /**
      * Sets the body of this request.
      *
-     * @param body  Body object
+     * @param body Body object
      * @return This {@link Request}
      */
     public Request<T> body(IJsonRequest body) {
         this.body = body;
-        return this;
-    }
-
-    public Request<T> requireAuthenticator(boolean requireAuthenticator) {
-        this.requireAuthenticator = requireAuthenticator;
         return this;
     }
 
@@ -191,10 +184,6 @@ public class Request<T extends IJsonResponse<T>> {
         }
     }
 
-    public boolean requiresAuthenticator() {
-        return requireAuthenticator;
-    }
-
     /**
      * Returns the response body class.
      *
@@ -207,7 +196,7 @@ public class Request<T extends IJsonResponse<T>> {
     /**
      * Executes this request using the {@link HttpClient} of the given {@link ApiService}.
      *
-     * @param callback  Result listener
+     * @param callback Result listener
      */
     public void execute(Callback<T> callback) {
         new RequestExecutor<T>(service.getClient()).executeRequest(this, responseClass, callback);

@@ -27,7 +27,5 @@ package com.bambora.nativepayment.widget;
  */
 public interface CardInputValidator {
     void setValidationPattern(String validationPattern);
-    void setFormatPattern(String formatPattern);
-    boolean isFormatted();
     boolean isValid();
 }

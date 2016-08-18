@@ -20,15 +20,14 @@
  * THE SOFTWARE.
  */
 
-package com.bambora.nativepayment.interfaces;
-
-import com.bambora.nativepayment.models.Credentials;
-import com.bambora.nativepayment.network.RequestError;
+package com.bambora.nativepayment.utils;
 
 /**
- * Interface for credentials loading callbacks.
+ * Class containing helper methods for handling Strings.
  */
-public interface IGetCredentialsCallback {
-    void onCredentialsReceived(Credentials credentials);
-    void onError(RequestError error);
+public class StringUtils {
+
+    public static String stripAllNonDigits(String stringToEdit) {
+        return stringToEdit.replaceAll("\\D", "");
+    }
 }

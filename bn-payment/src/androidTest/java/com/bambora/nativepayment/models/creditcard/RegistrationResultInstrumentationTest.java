@@ -20,20 +20,32 @@
  * THE SOFTWARE.
  */
 
-package com.bambora.nativepayment.interfaces;
+package com.bambora.nativepayment.models.creditcard;
 
+import android.test.InstrumentationTestCase;
 
-import com.bambora.nativepayment.network.RequestError;
+import org.json.JSONException;
 
 /**
- * An interface defining a callback for then Credentials are loaded from disk.
+ * TODO
  */
-public interface ICredentialsObserver {
-    /**
-     * A method indicating the result of an operation loading credentials.
-     *
-     * @param success A boolean indicating the result of the operation.
-     */
-    void onCredentialsLoaded();
-    void onCredentialsError(RequestError error);
+public class RegistrationResultInstrumentationTest extends InstrumentationTestCase {
+
+    public void testFromJsonWithoutParameters() throws JSONException {
+        // Given
+        String resultJson = "{}";
+
+        // When
+        RegistrationResult registrationResult = RegistrationResult.fromJson(resultJson);
+
+        // Then
+        assertNull(registrationResult.meta);
+        assertNull(registrationResult.truncatedCardNumber);
+        assertNull(registrationResult.expiryMonth);
+        assertNull(registrationResult.expiryYear);
+        assertNull(registrationResult.paymentType);
+        assertNull(registrationResult.transactionId);
+        assertNull(registrationResult.subscriptionId);
+        assertNull(registrationResult.originIp);
+    }
 }

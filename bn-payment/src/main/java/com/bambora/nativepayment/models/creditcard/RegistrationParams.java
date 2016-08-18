@@ -31,6 +31,7 @@ import com.bambora.nativepayment.logging.BNLog;
 import com.bambora.nativepayment.managers.CertificateManager;
 import com.bambora.nativepayment.security.Crypto;
 import com.bambora.nativepayment.security.EncryptionCertificate;
+import com.bambora.nativepayment.utils.StringUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -58,16 +59,27 @@ public class RegistrationParams implements IJsonRequest {
 
     private static final String KEY_ENCRYPTED_CARD = "encryptedCard";
     private static final String KEY_ENCRYPTED_SESSION_KEYS = "encryptedSessionKeys";
+    private static final String KEY_BIN_NUMBER = "binNumber";
+
+    private static final int BIN_NUMBER_LENGTH = 6;
 
     public CardDetails encryptedCard;
     public List<EncryptedSessionKey> encryptedSessionKeys;
+    public String binNumber;
 
-    private Crypto crypto = new Crypto();
+    private final Crypto crypto;
+    private final CertificateManager certificateManager;
 
     public interface IOnEncryptionListener {
         void onEncryptionComplete();
         void onEncryptionError();
     }
+
+    public RegistrationParams(Crypto crypto, CertificateManager certificateManager) {
+        this.crypto = crypto;
+        this.certificateManager = certificateManager;
+    }
+
     /**
      * Takes credit card details of the card to be registered and encrypts them.
      * <p>A private AES key is generated with which the credit card details are encrypted. This key
@@ -81,6 +93,9 @@ public class RegistrationParams implements IJsonRequest {
      */
     public void setParametersAndEncrypt(Context context, String cardNumber, String expiryMonth,
                                         String expiryYear, String securityCode, final IOnEncryptionListener listener) {
+        if (cardNumber != null) {
+            cardNumber = StringUtils.stripAllNonDigits(cardNumber);
+        }
         try {
             SecretKey sessionKey = generateSessionKey();
             this.encryptedCard = new CardDetails(cardNumber, securityCode, expiryMonth, expiryYear).encrypt(sessionKey);
@@ -88,19 +103,20 @@ public class RegistrationParams implements IJsonRequest {
                 @Override
                 public void onEncryptionComplete(List<EncryptedSessionKey> encryptedKeys) {
                     encryptedSessionKeys = encryptedKeys;
-                    listener.onEncryptionComplete();
+                    if (listener != null) listener.onEncryptionComplete();
                 }
 
                 @Override
                 public void onError() {
-                    listener.onEncryptionError();
+                    if (listener != null) listener.onEncryptionError();
                 }
             });
+            this.binNumber = parseBinNumber(cardNumber);
         } catch (Exception exception) {
             BNLog.e(getClass().getSimpleName(), "Failed to encrypt card registration parameters.", exception);
             this.encryptedCard = null;
             this.encryptedSessionKeys = null;
-            listener.onEncryptionError();
+            if (listener != null) listener.onEncryptionError();
         }
     }
 
@@ -108,12 +124,17 @@ public class RegistrationParams implements IJsonRequest {
     public String getSerialized() {
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put(KEY_ENCRYPTED_CARD, encryptedCard.getJsonObject());
-            JSONArray sessionKeys = new JSONArray();
-            for (EncryptedSessionKey key : encryptedSessionKeys) {
-                sessionKeys.put(key.getJsonObject());
+            if (encryptedCard != null) {
+                jsonObject.put(KEY_ENCRYPTED_CARD, encryptedCard.getJsonObject());
             }
-            jsonObject.put(KEY_ENCRYPTED_SESSION_KEYS, sessionKeys);
+            if (encryptedSessionKeys != null) {
+                JSONArray sessionKeys = new JSONArray();
+                for (EncryptedSessionKey key : encryptedSessionKeys) {
+                    sessionKeys.put(key.getJsonObject());
+                }
+                jsonObject.put(KEY_ENCRYPTED_SESSION_KEYS, sessionKeys);
+            }
+            jsonObject.putOpt(KEY_BIN_NUMBER, this.binNumber);
         } catch (JSONException e) {
             BNLog.jsonParseError(getClass().getSimpleName(), e);
         }
@@ -140,7 +161,7 @@ public class RegistrationParams implements IJsonRequest {
      */
     private void encryptSessionKey(Context context, final SecretKey sessionKey,
                 final ISessionKeyEncryptionListener listener) {
-        CertificateManager.getInstance().getEncryptionCertificates(context, new ICertificateLoadCallback() {
+        certificateManager.getEncryptionCertificates(context, new ICertificateLoadCallback() {
             @Override
             public void onCertificatesLoaded(List<EncryptionCertificate> certificates) {
                 if (certificates == null || certificates.isEmpty()) {
@@ -268,5 +289,12 @@ public class RegistrationParams implements IJsonRequest {
             }
             return jsonObject;
         }
+    }
+
+    private String parseBinNumber(String cardNumber) {
+        if (cardNumber.length() >= BIN_NUMBER_LENGTH) {
+            return cardNumber.substring(0, BIN_NUMBER_LENGTH);
+        }
+        return null;
     }
 }

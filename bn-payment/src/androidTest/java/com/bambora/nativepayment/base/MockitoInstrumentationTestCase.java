@@ -20,41 +20,21 @@
  * THE SOFTWARE.
  */
 
-package com.bambora.nativepayment.models.creditcard;
+package com.bambora.nativepayment.base;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import android.test.InstrumentationTestCase;
 
 /**
- * Hold meta data of the card registration session
- * @author Lovisa Corp
+ * Base class for instrumentation tests using Mockito. It sets up Dexmaker (needed by Mockito when
+ * running on the Android VM) to find the correct cache directory path.
  */
-public class RegistrationResultMeta {
+public class MockitoInstrumentationTestCase extends InstrumentationTestCase {
 
-    private static final String KEY_ACTION = "action";
-    private static final String KEY_MESSAGE = "message";
-    private static final String KEY_RESULT = "result";
-
-    /**
-     * {@link RegistrationResultAction} object
-     */
-    public RegistrationResultAction action;
-
-    /**
-     * {@link RegistrationResultMessage} object
-     */
-    public RegistrationResultMessage message;
-
-    /**
-     * True if result is included
-     */
-    public Boolean result;
-
-    public RegistrationResultMeta(JSONObject jsonObject) throws JSONException {
-        if (jsonObject != null) {
-            this.action = new RegistrationResultAction(jsonObject.optJSONObject(KEY_ACTION));
-            this.message = new RegistrationResultMessage(jsonObject.optJSONObject(KEY_MESSAGE));
-            this.result = jsonObject.optBoolean(KEY_RESULT);
-        }
+    public void setUp() {
+        // Workaround for crash due to Dexmaker not finding the Android cache directory.
+        // Source: https://code.google.com/archive/p/dexmaker/issues/2
+        System.setProperty(
+                "dexmaker.dexcache",
+                getInstrumentation().getTargetContext().getCacheDir().getPath());
     }
 }

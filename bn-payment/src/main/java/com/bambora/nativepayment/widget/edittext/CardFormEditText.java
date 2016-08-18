@@ -44,7 +44,6 @@ public abstract class CardFormEditText extends EditText implements CardInputVali
         OnFocusChangeListener {
 
     private Pattern validationPattern;
-    private Pattern formatPattern;
     private IOnValidationEventListener validationEventListener;
 
     public CardFormEditText(Context context) {
@@ -68,7 +67,7 @@ public abstract class CardFormEditText extends EditText implements CardInputVali
         setupView();
     }
 
-    public abstract Integer getMaxLength();
+    public abstract Integer getDefaultMaxLength();
 
     public abstract String getDefaultHint();
 
@@ -81,18 +80,6 @@ public abstract class CardFormEditText extends EditText implements CardInputVali
         if (validationPattern != null) {
             this.validationPattern = Pattern.compile(validationPattern);
         }
-    }
-
-    @Override
-    public void setFormatPattern(String formatPattern) {
-        if (formatPattern != null) {
-            this.formatPattern = Pattern.compile(formatPattern);
-        }
-    }
-
-    @Override
-    public boolean isFormatted() {
-        return formatPattern == null || formatPattern.matcher(getText()).matches();
     }
 
     @Override
@@ -119,7 +106,7 @@ public abstract class CardFormEditText extends EditText implements CardInputVali
     private void setupView() {
         setInputType(InputType.TYPE_CLASS_PHONE);
         setOnFocusChangeListener(this);
-        setMaxLengthFilter();
+        setMaxLengthFilter(getDefaultMaxLength());
         setDefaultHint();
     }
 
@@ -130,12 +117,9 @@ public abstract class CardFormEditText extends EditText implements CardInputVali
         }
     }
 
-    private void setMaxLengthFilter() {
-        Integer maxLength = getMaxLength();
-        if (maxLength != null) {
-            InputFilter[] filterArray = {new InputFilter.LengthFilter(maxLength)};
-            setFilters(filterArray);
-        }
+    protected void setMaxLengthFilter(int maxLength) {
+        InputFilter[] filterArray = {new InputFilter.LengthFilter(maxLength)};
+        setFilters(filterArray);
     }
 
     public interface IOnValidationEventListener {

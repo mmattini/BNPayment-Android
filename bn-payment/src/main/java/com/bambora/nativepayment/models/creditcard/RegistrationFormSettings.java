@@ -25,12 +25,8 @@ package com.bambora.nativepayment.models.creditcard;
 import com.bambora.nativepayment.interfaces.IJsonRequest;
 import com.bambora.nativepayment.logging.BNLog;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Used for customizing the credit card registration form.
@@ -47,7 +43,9 @@ public class RegistrationFormSettings implements IJsonRequest {
 
     private static final String KEY_PLATFORM = "platform";
     private static final String KEY_CSS_URL = "cssurl";
-    private static final String KEY_INPUT_GROUPS = "inputgroups";
+    private static final String KEY_CARD_NUMBER = "cardNumber";
+    private static final String KEY_CARD_EXPIRY = "cardExpiry";
+    private static final String KEY_CARD_VERIFICATION = "cardVerification";
     private static final String KEY_SUBMIT_BUTTON = "submitbutton";
 
     private InputGroup cardNumberInputGroup = new InputGroup(INPUT_GROUP_CARD_NUMBER);
@@ -57,7 +55,7 @@ public class RegistrationFormSettings implements IJsonRequest {
     /**
      * Describes which platform the form is intended for
      */
-    private String platform = "android";
+    private static final String PLATFORM = "android";
 
     /**
      * URL to CSS file for styling the credit card registration form
@@ -66,22 +64,9 @@ public class RegistrationFormSettings implements IJsonRequest {
     private String cssUrl;
 
     /**
-     * List of {@link InputGroup}
-     * <p>Sets placeholder texts for input values in the registration form.</p>
-     */
-    private List<InputGroup> inputGroups;
-
-    /**
      * Text for the submit button
      */
     private String submitButtonText;
-
-    public RegistrationFormSettings() {
-        inputGroups = new ArrayList<>();
-        inputGroups.add(cardNumberInputGroup);
-        inputGroups.add(cardExpiryDateInputGroup);
-        inputGroups.add(cardCvvInputGroup);
-    }
 
     /**
      * Sets URL to CSS file for formatting the registration form
@@ -117,18 +102,6 @@ public class RegistrationFormSettings implements IJsonRequest {
     }
 
     /**
-     * Adds an {@link InputGroup} for setting placeholder text on specified input section
-     *
-     * @param name          Input section class name (CSS class)
-     * @param placeholder   Placeholder text visible in specified text field
-     */
-    public void addInputGroup(String name, String placeholder) {
-        if (name != null && !name.isEmpty()) {
-            this.inputGroups.add(new InputGroup(name, placeholder));
-        }
-    }
-
-    /**
      * Sets the text that's visible on the submit button
      * @param text  Button text
      */
@@ -140,14 +113,11 @@ public class RegistrationFormSettings implements IJsonRequest {
     public String getSerialized() {
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put(KEY_PLATFORM, platform);
+            jsonObject.put(KEY_PLATFORM, PLATFORM);
             jsonObject.put(KEY_CSS_URL, cssUrl);
-            JSONArray inputGroupArray = new JSONArray();
-            for (InputGroup inputGroup : inputGroups) {
-                JSONObject inputGroupJsonObject = new JSONObject(inputGroup.getSerialized());
-                inputGroupArray.put(inputGroupJsonObject);
-            }
-            jsonObject.put(KEY_INPUT_GROUPS, inputGroupArray);
+            jsonObject.put(KEY_CARD_NUMBER, new JSONObject(cardNumberInputGroup.getSerialized()));
+            jsonObject.put(KEY_CARD_EXPIRY, new JSONObject(cardExpiryDateInputGroup.getSerialized()));
+            jsonObject.put(KEY_CARD_VERIFICATION, new JSONObject(cardCvvInputGroup.getSerialized()));
             jsonObject.put(KEY_SUBMIT_BUTTON, submitButtonText);
         } catch (JSONException e) {
             BNLog.jsonParseError(getClass().getSimpleName(), e);

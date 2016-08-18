@@ -28,8 +28,10 @@ import android.text.TextWatcher;
 import com.bambora.nativepayment.widget.CardInputValidator;
 import com.bambora.nativepayment.widget.FormInputHelper;
 
+import java.util.regex.Pattern;
+
 /**
- * TODO
+ * A custom {@link TextWatcher} for formatting input as a card security code.
  */
 public class SecurityCodeTextWatcher implements TextWatcher {
 
@@ -40,7 +42,6 @@ public class SecurityCodeTextWatcher implements TextWatcher {
 
     public SecurityCodeTextWatcher(CardInputValidator inputFormatter) {
         this.formatter = inputFormatter;
-        this.formatter.setFormatPattern(FORMAT);
         this.formatter.setValidationPattern(VALID_INPUT);
     }
 
@@ -52,7 +53,7 @@ public class SecurityCodeTextWatcher implements TextWatcher {
 
     @Override
     public void afterTextChanged(Editable s) {
-        if (!formatter.isFormatted()) {
+        if (!Pattern.compile(FORMAT).matcher(s).matches()) {
             CharSequence sequence = FormInputHelper.clearNonDigits(s.toString());
             s.replace(0, s.length(), sequence);
         }

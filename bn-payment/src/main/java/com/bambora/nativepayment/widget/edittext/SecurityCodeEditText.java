@@ -56,7 +56,7 @@ public class SecurityCodeEditText extends CardFormEditText {
     }
 
     @Override
-    public Integer getMaxLength() {
+    public Integer getDefaultMaxLength() {
         return MAX_LENGTH;
     }
 

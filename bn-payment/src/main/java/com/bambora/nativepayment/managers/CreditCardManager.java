@@ -28,6 +28,7 @@ import com.bambora.nativepayment.interfaces.ICardRegistrationCallback;
 import com.bambora.nativepayment.models.creditcard.CreditCard;
 import com.bambora.nativepayment.models.creditcard.RegistrationParams;
 import com.bambora.nativepayment.models.creditcard.RegistrationParams.IOnEncryptionListener;
+import com.bambora.nativepayment.security.Crypto;
 import com.bambora.nativepayment.network.RequestError;
 import com.bambora.nativepayment.services.PaymentApiService;
 import com.bambora.nativepayment.storage.FileStorage;
@@ -60,7 +61,7 @@ public class CreditCardManager {
      */
     public void registerCreditCard(final Context context, String cardNumber, String expiryMonth, String expiryYear,
                                    String securityCode, final ICardRegistrationCallback listener) {
-        final RegistrationParams params = new RegistrationParams();
+        final RegistrationParams params = new RegistrationParams(new Crypto(), CertificateManager.getInstance());
         params.setParametersAndEncrypt(context, cardNumber, expiryMonth, expiryYear, securityCode,
                 new IOnEncryptionListener() {
                     @Override

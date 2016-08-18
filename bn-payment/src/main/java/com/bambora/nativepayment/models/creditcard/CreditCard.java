@@ -23,7 +23,8 @@
 package com.bambora.nativepayment.models.creditcard;
 
 import com.bambora.nativepayment.interfaces.IJsonResponse;
-import com.bambora.nativepayment.logging.BNLog;
+import com.bambora.nativepayment.json.JsonContainer;
+import com.bambora.nativepayment.utils.JsonUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -99,23 +100,14 @@ public class CreditCard implements Serializable, IJsonResponse<CreditCard> {
         }
     }
 
-    public CreditCard(JSONObject jsonObject) {
-        this.creditCardToken = jsonObject.optString(KEY_RECURRING_PAYMENT_ID);
-        this.truncatedCardNumber = jsonObject.optString(KEY_CARD_NUMBER);
-        this.paymentType = jsonObject.optString(KEY_CARD_TYPE);
-        this.expiryMonth = jsonObject.optInt(KEY_EXPIRY_MONTH);
-        this.expiryYear = jsonObject.optInt(KEY_EXPIRY_YEAR);
-    }
-
     @Override
-    public CreditCard fromJson(String jsonString) throws JSONException {
-        JSONObject jsonObject;
-        try {
-            jsonObject = new JSONObject(jsonString);
-            return new CreditCard(jsonObject);
-        } catch (JSONException e) {
-            BNLog.jsonParseError(getClass().getSimpleName(), e);
-        }
+    public CreditCard fromJson(JsonContainer jsonContainer) throws JSONException {
+        JSONObject jsonObject = jsonContainer.getJsonObject();
+        this.creditCardToken = JsonUtils.getStringIfExists(jsonObject, KEY_RECURRING_PAYMENT_ID);
+        this.truncatedCardNumber = JsonUtils.getStringIfExists(jsonObject, KEY_CARD_NUMBER);
+        this.paymentType = JsonUtils.getStringIfExists(jsonObject, KEY_CARD_TYPE);
+        this.expiryMonth = JsonUtils.getIntIfExists(jsonObject, KEY_EXPIRY_MONTH);
+        this.expiryYear = JsonUtils.getIntIfExists(jsonObject, KEY_EXPIRY_YEAR);
         return this;
     }
 
