@@ -27,3 +27,5 @@ dependencies {
 }
 
 apply plugin: 'com.getkeepsafe.dexcount'
+
+artifactoryPublish.skip=true

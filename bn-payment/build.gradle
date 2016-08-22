@@ -39,5 +39,5 @@ dependencies {
     androidTestCompile "com.google.dexmaker:dexmaker-mockito:1.2"
 }
 
-apply from: "bintray.gradle"
 apply from: "sonar.gradle"
+apply from: "artifactory.gradle"
