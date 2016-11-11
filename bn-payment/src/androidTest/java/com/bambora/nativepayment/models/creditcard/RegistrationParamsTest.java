@@ -23,17 +23,21 @@
 package com.bambora.nativepayment.models.creditcard;
 
 import android.content.Context;
+import android.support.test.runner.AndroidJUnit4;
 
 import com.bambora.nativepayment.base.MockitoInstrumentationTestCase;
 import com.bambora.nativepayment.interfaces.ICertificateLoadCallback;
 import com.bambora.nativepayment.managers.CertificateManager;
 import com.bambora.nativepayment.security.Crypto;
-import com.bambora.nativepayment.security.InstrumentationTestData;
+import com.bambora.nativepayment.security.TestData;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -42,9 +46,10 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 
 /**
- * Class for testing the {@link RegistrationParams} model that is used when registering credit cards.
+ * Instrumented tests for the {@link RegistrationParams} model.
  */
-public class RegistrationParamsInstrumentationTest extends MockitoInstrumentationTestCase {
+@RunWith(AndroidJUnit4.class)
+public class RegistrationParamsTest extends MockitoInstrumentationTestCase {
 
     private RegistrationParams registrationParams;
     private Context context;
@@ -59,6 +64,7 @@ public class RegistrationParamsInstrumentationTest extends MockitoInstrumentatio
 
     private CertificateManager certificateManager;
 
+    @Before
     @Override
     public void setUp() {
         super.setUp();
@@ -67,6 +73,7 @@ public class RegistrationParamsInstrumentationTest extends MockitoInstrumentatio
         this.context = Mockito.mock(Context.class);
     }
 
+    @Test
     public void testWithNullParams() {
         // Given
         registrationParams.setParametersAndEncrypt(this.context, null, null, null, null, null);
@@ -78,6 +85,7 @@ public class RegistrationParamsInstrumentationTest extends MockitoInstrumentatio
         Assert.assertEquals("{}", json);
     }
 
+    @Test
     public void testWithValidParameters() throws JSONException {
         // Given
         String cardNumber = "1111 2222 3333 4444";
@@ -89,7 +97,7 @@ public class RegistrationParamsInstrumentationTest extends MockitoInstrumentatio
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
                 ICertificateLoadCallback callback = (ICertificateLoadCallback) invocation.getArguments()[1];
-                callback.onCertificatesLoaded(InstrumentationTestData.getTestEncryptionCerts());
+                callback.onCertificatesLoaded(TestData.getTestEncryptionCerts());
                 return null;
             }
         }).when(certificateManager).getEncryptionCertificates(any(Context.class), any(ICertificateLoadCallback.class));

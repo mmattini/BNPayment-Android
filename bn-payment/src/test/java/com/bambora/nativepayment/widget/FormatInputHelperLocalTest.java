@@ -20,24 +20,47 @@
  * THE SOFTWARE.
  */
 
-package com.bambora.nativepayment.mock;
+package com.bambora.nativepayment.widget;
 
-import com.bambora.nativepayment.managers.CreditCardManager;
-import com.bambora.nativepayment.models.creditcard.CreditCard;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
- * @author Lovisa Corp
+ * Local tests for the {@link FormInputHelper} class.
  */
-public class OnCreditCardSavedMock implements CreditCardManager.IOnCreditCardSaved {
+public class FormatInputHelperLocalTest {
 
-    private boolean onCreditCardSavedCalled;
+    @Test
+    public void nonDigitsShouldBeDeleted() {
+        // Given
+        String expectedString = "1234567890";
 
-    public boolean wasOnCreditCardSavedCalled() {
-        return onCreditCardSavedCalled;
+        // When
+        String stringToEdit = FormInputHelper.clearNonDigits("-.,§?/()]≈[abcdefghijk1234567890lmnopqrstuvqyzåäö");
+
+        // Then
+        Assert.assertEquals(expectedString, stringToEdit);
     }
 
-    @Override
-    public void onCreditCardSaved(CreditCard creditCard) {
-        onCreditCardSavedCalled = true;
+    @Test
+    public void charactersOutsideSpecifiedBoundsShouldBeDeleted() {
+        // Given
+        CharSequence characterSequence = "0123456789Test-.,";
+        String expectedString = "0123456789";
+
+        // When
+        String result = FormInputHelper.getDeletedChars(characterSequence, 0, 10);
+
+        // Then
+        Assert.assertEquals(expectedString, result);
+    }
+
+    @Test
+    public void shouldCreateObject() {
+        // When
+        FormInputHelper formInputHelperObject = new FormInputHelper();
+
+        // Then
+        Assert.assertEquals(FormInputHelper.class, formInputHelperObject.getClass());
     }
 }

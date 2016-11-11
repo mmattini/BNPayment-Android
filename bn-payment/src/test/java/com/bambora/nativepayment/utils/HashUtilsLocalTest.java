@@ -20,24 +20,28 @@
  * THE SOFTWARE.
  */
 
-package com.bambora.nativepayment.mock;
+package com.bambora.nativepayment.utils;
 
-import com.bambora.nativepayment.managers.CreditCardManager;
-import com.bambora.nativepayment.models.creditcard.CreditCard;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.security.GeneralSecurityException;
 
 /**
- * @author Lovisa Corp
+ * Local tests for the {@link HashUtils} class.
  */
-public class OnCreditCardSavedMock implements CreditCardManager.IOnCreditCardSaved {
+public class HashUtilsLocalTest {
 
-    private boolean onCreditCardSavedCalled;
+    private static final String HASH_ALGORITHM = "HmacSHA256";
+    private static final String TEST_KEY = "SecretKey";
+    private static final String TEST_STRING_TO_HASH = "A message to hash.";
+    private static final String EXPECTED_RESULT = "87276fcff3d5f8bf47359a1f61106e8605be6b1b9fa8ab047e75d01178068ab9";
 
-    public boolean wasOnCreditCardSavedCalled() {
-        return onCreditCardSavedCalled;
-    }
-
-    @Override
-    public void onCreditCardSaved(CreditCard creditCard) {
-        onCreditCardSavedCalled = true;
+    @Test
+    public void shouldGenerateValidHmac() throws GeneralSecurityException {
+        // When
+        String hmac = HashUtils.generateHmac(HASH_ALGORITHM, TEST_STRING_TO_HASH, TEST_KEY);
+        // Then
+        Assert.assertEquals(EXPECTED_RESULT, hmac);
     }
 }

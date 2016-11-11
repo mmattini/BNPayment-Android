@@ -20,24 +20,35 @@
  * THE SOFTWARE.
  */
 
-package com.bambora.nativepayment.mock;
+package com.bambora.nativepayment.security;
 
-import com.bambora.nativepayment.managers.CreditCardManager;
-import com.bambora.nativepayment.models.creditcard.CreditCard;
+import com.bambora.nativepayment.utils.CertificateUtils;
+
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.security.PublicKey;
+import java.security.cert.Certificate;
+import java.util.Arrays;
 
 /**
- * @author Lovisa Corp
+ * Local tests for the {@link CertificateUtils} class.
  */
-public class OnCreditCardSavedMock implements CreditCardManager.IOnCreditCardSaved {
+public class CertificateUtilsLocalTest {
 
-    private boolean onCreditCardSavedCalled;
+    @Test
+    public void parsedCertificateStringShouldMatchCertfile() throws Exception {
+        //When
+        Certificate certificate = CertificateUtils.parseCertificate(LocalTestData.getCertificateFromString());
 
-    public boolean wasOnCreditCardSavedCalled() {
-        return onCreditCardSavedCalled;
-    }
+        // Then
+        Assert.assertNotNull(certificate);
 
-    @Override
-    public void onCreditCardSaved(CreditCard creditCard) {
-        onCreditCardSavedCalled = true;
+        // When
+        PublicKey publicKeyFromString = certificate.getPublicKey();
+        PublicKey publicKeyFromKeyStore = LocalTestData.getKeyPairFromRSAKeystore(getClass().getClassLoader()).getPublic();
+
+        // Then
+        Assert.assertTrue(Arrays.equals(publicKeyFromString.getEncoded(), publicKeyFromKeyStore.getEncoded()));
     }
 }

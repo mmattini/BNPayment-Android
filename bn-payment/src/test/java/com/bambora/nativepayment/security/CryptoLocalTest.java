@@ -1,5 +1,26 @@
-package com.bambora.nativepayment.security;
+/*
+ * Copyright (c) 2016 Bambora ( http://bambora.com/ )
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 
+package com.bambora.nativepayment.security;
 
 import com.bambora.nativepayment.utils.CertificateUtils;
 
@@ -17,9 +38,9 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 /**
- * TODO
+ * Local tests for the {@link Crypto} class.
  */
-public class TestCrypto {
+public class CryptoLocalTest {
 
     private static final String STRING_TO_ENCRYPT = "String to encrypt";
     private static final String RSA_ENCRYPTED_DATA =
@@ -41,83 +62,145 @@ public class TestCrypto {
     private PublicKey rsaPublicKey;
     private SecretKey aesKey;
 
-    public TestCrypto() throws Exception {
+    public CryptoLocalTest() throws Exception {
         crypto = new Crypto();
         aesKey = new SecretKeySpec(AES_TEST_KEY, Crypto.AES_ALGORITHM);
-        KeyPair rsaKeyPair = TestData.getKeyPairFromRSAKeystore(getClass().getClassLoader());
+        KeyPair rsaKeyPair = LocalTestData.getKeyPairFromRSAKeystore(getClass().getClassLoader());
         rsaPrivateKey = rsaKeyPair.getPrivate();
-        rsaPublicKey = CertificateUtils.parseCertificate(TestData.getCertificateFromString()).getPublicKey();
+        rsaPublicKey = CertificateUtils.parseCertificate(LocalTestData.getCertificateFromString()).getPublicKey();
     }
 
     @Test
-    public void testRSAEncrypt() throws Exception {
+    public void RSAEncryptionShouldSucceed() throws Exception {
+        // When
         byte[] encrypted = crypto.RSAEncrypt(toBytes(STRING_TO_ENCRYPT), rsaPublicKey);
         byte[] decrypted = crypto.RSADecrypt(encrypted, rsaPrivateKey);
         String decryptedString = new String(decrypted, Crypto.UTF8_CHARSET);
+
+        // Then
         Assert.assertEquals(STRING_TO_ENCRYPT, decryptedString);
     }
 
     @Test
-    public void testRSADecrypt() throws Exception {
+    public void RSAEncryptionShouldReturnNull() throws Exception {
+        // When
+        byte[] encrypted = crypto.RSAEncrypt(null, rsaPublicKey);
+
+        // Then
+        Assert.assertNull(encrypted);
+    }
+
+    @Test
+    public void RSADecryptionShouldReturnEmptyString() throws Exception {
+        // When
+        byte[] encrypted = crypto.RSAEncrypt(toBytes(""), rsaPublicKey);
+        byte[] decrypted = crypto.RSADecrypt(encrypted, rsaPrivateKey);
+        String decryptedString = new String(decrypted, Crypto.UTF8_CHARSET);
+
+        // Then
+        Assert.assertTrue(decryptedString.isEmpty());
+    }
+
+    @Test
+    public void RSADecryptionShouldSucceed() throws Exception {
+        // When
         byte[] decrypted = crypto.RSADecrypt(Base64.decodeBase64(RSA_ENCRYPTED_DATA), rsaPrivateKey);
         String decryptedString = new String(decrypted, Crypto.UTF8_CHARSET);
+
+        // Then
         Assert.assertEquals(STRING_TO_ENCRYPT, decryptedString);
     }
 
     @Test(expected = GeneralSecurityException.class)
-    public void testRSADecryptWithInvalidKey() throws Exception {
+    public void RSADecryptionShouldFailWhenUsingAnInvalidKey() throws Exception {
+        // Given
         String stringToEncrypt = "Secret string";
+
+        // When
         byte[] encrypted = crypto.RSAEncrypt(toBytes(stringToEncrypt), rsaPublicKey);
         PrivateKey invalidKey = crypto.generateRSAKeyPair().getPrivate();
         crypto.RSADecrypt(encrypted, invalidKey);
     }
 
     @Test
-    public void testRSAEncryptOnNullValue() throws Exception {
-        byte[] encrypted = crypto.RSAEncrypt(null, rsaPublicKey);
-        Assert.assertNull(encrypted);
+    public void RSADecryptionShouldReturnNull() throws Exception {
+        // When
+        byte[] result = crypto.RSADecrypt(null, rsaPrivateKey);
+
+        // Then
+        Assert.assertNull(result);
     }
 
     @Test
-    public void testRSAEncryptOnEmptyValue() throws Exception {
-        byte[] encrypted = crypto.RSAEncrypt(toBytes(""), rsaPublicKey);
-        byte[] decrypted = crypto.RSADecrypt(encrypted, rsaPrivateKey);
-        String decryptedString = new String(decrypted, Crypto.UTF8_CHARSET);
-        Assert.assertTrue(decryptedString.isEmpty());
-    }
-
-    @Test
-    public void testAESEncrypt() throws Exception {
+    public void AESEncryptionShouldSucceed() throws Exception {
+        // When
         byte[] encrypted = crypto.AESEncrypt(STRING_TO_ENCRYPT, aesKey);
+
+        // Then
         Assert.assertEquals(AES_ENCRYPTED_DATA, Base64.encodeBase64String(encrypted));
+
+        // When
         byte[] decrypted = crypto.AESDecrypt(encrypted, aesKey);
         String decryptedString = new String(decrypted, Crypto.UTF8_CHARSET);
+
+        // Then
         Assert.assertEquals(STRING_TO_ENCRYPT, decryptedString);
     }
 
     @Test
-    public void testAESDecrypt() throws Exception {
+    public void AESEncryptionShouldReturnNull() throws Exception {
+        // When
+        byte[] result = crypto.AESEncrypt(null, aesKey);
+
+        // Then
+        Assert.assertNull(result);
+    }
+
+    @Test
+    public void AESDecryptionShouldSucceed() throws Exception {
+        // Given
         String toDecrypt = "lBTaVm9kUS4QKnwiklUNWP2PEdioELFF6FbMsJwT7CA=";
+
+        // When
         byte[] decrypted = crypto.AESDecrypt(Base64.decodeBase64(toDecrypt), aesKey);
         String decryptedString = new String(decrypted, Crypto.UTF8_CHARSET);
+
+        // Then
         Assert.assertEquals("String to encrypt", decryptedString);
     }
 
     @Test
-    public void generatedAESKeyShouldEncryptDecryptable() throws Exception {
-        SecretKey generatedKey = crypto.generateRandomAES128();
-        byte[] encrypted = crypto.RSAEncrypt(generatedKey.getEncoded(), rsaPublicKey);
-        byte[] decrypted = crypto.RSADecrypt(encrypted, rsaPrivateKey);
-        Assert.assertEquals(Base64.encodeBase64String(generatedKey.getEncoded()),
-                Base64.encodeBase64String(decrypted));
+    public void AESDecryptionShouldReturnNull() throws Exception {
+        // When
+        byte[] result = crypto.AESDecrypt(null, aesKey);
+
+        // Then
+        Assert.assertNull(result);
     }
 
     @Test(expected = GeneralSecurityException.class)
-    public void testAESDecryptWithInvalidKey() throws Exception {
+    public void AESDecryptionWithInvalidKeyShouldFail() throws Exception {
+        // Given
         String stringToEncrypt = "Another secret";
+
+        // When
         byte[] encrypted = crypto.AESEncrypt(stringToEncrypt, aesKey);
         SecretKey invalidKey = crypto.generateRandomAES128();
         crypto.AESDecrypt(encrypted, invalidKey);
+    }
+
+    @Test
+    public void generatedAESKeyShouldEncryptDecryptable() throws Exception {
+        // Given
+        SecretKey generatedKey = crypto.generateRandomAES128();
+
+        // When
+        byte[] encrypted = crypto.RSAEncrypt(generatedKey.getEncoded(), rsaPublicKey);
+        byte[] decrypted = crypto.RSADecrypt(encrypted, rsaPrivateKey);
+
+        // Then
+        Assert.assertEquals(Base64.encodeBase64String(generatedKey.getEncoded()),
+                Base64.encodeBase64String(decrypted));
     }
 
     private byte[] toBytes(String string) throws UnsupportedEncodingException {

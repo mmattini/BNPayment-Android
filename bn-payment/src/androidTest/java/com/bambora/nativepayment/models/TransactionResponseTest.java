@@ -22,7 +22,7 @@
 
 package com.bambora.nativepayment.models;
 
-import android.test.InstrumentationTestCase;
+import android.support.test.runner.AndroidJUnit4;
 
 import com.bambora.nativepayment.json.JsonContainer;
 import com.bambora.nativepayment.models.creditcard.TransactionErrorResponse;
@@ -30,11 +30,14 @@ import com.bambora.nativepayment.models.creditcard.TransactionErrorResponse;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
- * TODO
+ * Instrumented tests for the {@link TransactionResponse} model.
  */
-public class TransactionResponseInstrumentationTest extends InstrumentationTestCase {
+@RunWith(AndroidJUnit4.class)
+public class TransactionResponseTest {
 
     private static final String KEY_PAYMENT_ID = "payment";
     private static final String KEY_AMOUNT = "amount";
@@ -44,6 +47,7 @@ public class TransactionResponseInstrumentationTest extends InstrumentationTestC
     private static final String KEY_MESSAGE = "message";
     private static final String KEY_INFO = "info";
 
+    @Test
     public void testFromJsonWithoutParameters() throws Exception {
         // Given
         TransactionResponse transactionResponse = new TransactionResponse();
@@ -62,6 +66,7 @@ public class TransactionResponseInstrumentationTest extends InstrumentationTestC
         Assert.assertNull(transactionResponse.errorInfo);
     }
 
+    @Test
     public void testFromJsonWithValidParameters() throws Exception {
         // Given
         String paymentId = "a-payment-id";
@@ -95,6 +100,7 @@ public class TransactionResponseInstrumentationTest extends InstrumentationTestC
         Assert.assertEquals(errorInfo, transactionResponse.errorInfo);
     }
 
+    @Test
     public void testGetErrorWithoutParameters() throws JSONException {
         // Given
         TransactionResponse transactionResponse = new TransactionResponse();
@@ -111,6 +117,7 @@ public class TransactionResponseInstrumentationTest extends InstrumentationTestC
         Assert.assertNull(errorResponse.errorInfo);
     }
 
+    @Test
     public void testGetErrorWithValidParameters() throws JSONException {
         // Given
         String paymentId = "a-payment-id";

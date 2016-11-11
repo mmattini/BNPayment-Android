@@ -22,19 +22,19 @@
 
 package com.bambora.nativepayment.base;
 
-import android.test.InstrumentationTestCase;
+import android.support.test.InstrumentationRegistry;
 
 /**
  * Base class for instrumentation tests using Mockito. It sets up Dexmaker (needed by Mockito when
  * running on the Android VM) to find the correct cache directory path.
  */
-public class MockitoInstrumentationTestCase extends InstrumentationTestCase {
+public class MockitoInstrumentationTestCase {
 
     public void setUp() {
         // Workaround for crash due to Dexmaker not finding the Android cache directory.
         // Source: https://code.google.com/archive/p/dexmaker/issues/2
         System.setProperty(
                 "dexmaker.dexcache",
-                getInstrumentation().getTargetContext().getCacheDir().getPath());
+                InstrumentationRegistry.getContext().getCacheDir().getPath());
     }
 }
