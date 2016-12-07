@@ -20,24 +20,34 @@
  * THE SOFTWARE.
  */
 
-package com.bambora.nativepayment.mock;
+package com.bambora.nativepayment.utils;
 
-import com.bambora.nativepayment.managers.CreditCardManager;
-import com.bambora.nativepayment.models.creditcard.CreditCard;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
- * @author Lovisa Corp
+ * Local tests for the {@link StringUtils} class.
  */
-public class OnCreditCardSavedMock implements CreditCardManager.IOnCreditCardSaved {
+public class StringUtilsLocalTest {
 
-    private boolean onCreditCardSavedCalled;
+    @Test
+    public void testStripAllNonDigits() {
+        // Given
+        String expectedString = "1234567890";
 
-    public boolean wasOnCreditCardSavedCalled() {
-        return onCreditCardSavedCalled;
+        // When
+        String stringToEdit = StringUtils.stripAllNonDigits("-.,§?/()]≈[abcdefghijk1234567890lmnopqrstuvqyzåäö");
+
+        // Then
+        Assert.assertEquals(expectedString, stringToEdit);
     }
 
-    @Override
-    public void onCreditCardSaved(CreditCard creditCard) {
-        onCreditCardSavedCalled = true;
+    @Test
+    public void testObjectCreation() {
+        // When
+        StringUtils stringUtilsObject = new StringUtils();
+
+        // Then
+        Assert.assertEquals(StringUtils.class, stringUtilsObject.getClass());
     }
 }

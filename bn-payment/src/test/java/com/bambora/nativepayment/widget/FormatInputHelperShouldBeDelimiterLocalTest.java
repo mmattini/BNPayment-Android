@@ -32,16 +32,16 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * TODO
+ * Local parametrized test for the shouldBeDelimiter method in the {@link FormInputHelper} class.
  */
 @RunWith(Parameterized.class)
-public class FormatInputHelperShouldBeDelimiterTest {
+public class FormatInputHelperShouldBeDelimiterLocalTest {
 
     private int index;
     private List<Integer> groupSizes;
     private boolean expectedResult;
 
-    public FormatInputHelperShouldBeDelimiterTest(int index, List<Integer> groupSizes, boolean expectedResult) {
+    public FormatInputHelperShouldBeDelimiterLocalTest(int index, List<Integer> groupSizes, boolean expectedResult) {
         this.index = index;
         this.groupSizes = groupSizes;
         this.expectedResult = expectedResult;

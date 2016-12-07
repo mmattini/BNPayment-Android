@@ -22,14 +22,20 @@
 
 package com.bambora.nativepayment.models.creditcard;
 
-import android.test.InstrumentationTestCase;
+import android.support.test.runner.AndroidJUnit4;
 
 import org.json.JSONException;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNull;
 
 /**
- * TODO
+ * Instrumented tests for the {@link RegistrationResult} model.
  */
-public class RegistrationResultInstrumentationTest extends InstrumentationTestCase {
+@RunWith(AndroidJUnit4.class)
+public class RegistrationResultTest {
 
     private static final String KEY_CARD_NUMBER = "truncatedcardnumber";
     private static final String KEY_EXPIRY_MONTH = "expmonth";
@@ -39,6 +45,7 @@ public class RegistrationResultInstrumentationTest extends InstrumentationTestCa
     private static final String KEY_SUBSCRIPTION_ID = "subscriptionid";
     private static final String KEY_ORIGIN_IP = "originip";
 
+    @Test
     public void testFromJsonWithoutParameters() throws JSONException {
         // Given
         String resultJson = "{}";
@@ -57,6 +64,7 @@ public class RegistrationResultInstrumentationTest extends InstrumentationTestCa
         assertNull(registrationResult.originIp);
     }
 
+    @Test
     public void testFromJsonWithValidParameters() throws JSONException {
         // Given
         String cardNumber = "123456789";

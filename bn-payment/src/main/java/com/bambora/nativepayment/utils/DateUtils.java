@@ -67,7 +67,7 @@ public class DateUtils {
     }
 
     public static Date addDays(Date date, int nrOfDays) {
-        long millis = nrOfDays*24*60*60*1000;
+        long millis = ((long) (nrOfDays))*24*60*60*1000;
         return new Date(date.getTime() + millis);
     }
 }

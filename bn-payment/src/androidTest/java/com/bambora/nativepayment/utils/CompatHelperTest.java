@@ -20,46 +20,40 @@
  * THE SOFTWARE.
  */
 
-package com.bambora.nativepayment.models.creditcard;
+package com.bambora.nativepayment.utils;
 
-import android.test.InstrumentationTestCase;
+import android.graphics.drawable.Drawable;
+import android.support.test.runner.AndroidJUnit4;
 
-import com.bambora.nativepayment.json.JsonContainer;
+import com.bambora.nativepayment.R;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import static android.support.test.InstrumentationRegistry.getInstrumentation;
 
 /**
- * TODO
+ * Instrumented tests for the {@link CompatHelper} class.
  */
-public class RegistrationResponseInstrumentationTest extends InstrumentationTestCase {
+@RunWith(AndroidJUnit4.class)
+public class CompatHelperTest {
 
-    private static final String KEY_SESSION_URL = "session_url";
-
-    public void testFromJsonWithNoParameters() throws JSONException {
-        // Given
-        JsonContainer responseJson = new JsonContainer("{}");
-        RegistrationResponse registrationResponse = new RegistrationResponse();
-
+    @Test
+    public void shouldReturnNonNullObject() {
         // When
-        registrationResponse.fromJson(responseJson);
+        Drawable icon = CompatHelper.getDrawable(getInstrumentation().getContext(), R.drawable.ic_visa, null);
 
         // Then
-        assertNull(registrationResponse.sessionUrl);
+        Assert.assertNotNull(icon);
     }
 
-    public void testFromJsonWithValidUrl() throws JSONException {
-        // Given
-        String url = "http://a.valid.url";
-        JSONObject responseJson = new JSONObject();
-        responseJson.put(KEY_SESSION_URL, url);
-        JsonContainer responseJsonContainer = new JsonContainer(responseJson);
-        RegistrationResponse registrationResponse = new RegistrationResponse();
-
+    @Test
+    public void shouldCreateObject() {
         // When
-        registrationResponse.fromJson(responseJsonContainer);
+        CompatHelper compatHelperObject = new CompatHelper();
 
         // Then
-        assertEquals(url, registrationResponse.sessionUrl);
+        Assert.assertEquals(CompatHelper.class, compatHelperObject.getClass());
     }
 }

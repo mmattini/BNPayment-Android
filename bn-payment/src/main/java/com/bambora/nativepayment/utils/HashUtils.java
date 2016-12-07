@@ -22,11 +22,9 @@
 
 package com.bambora.nativepayment.utils;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import javax.crypto.Mac;
@@ -74,77 +72,4 @@ public class HashUtils {
         return new String(hexChars);
     }
 
-    /**
-     * This is a method for generating the proof of work used by the user registration.
-     * This method combines uuid, path, timestamp and a hash in order to create an hash.
-     * The hash must have a number of leading zeroes defined in the input param powDifficulty.
-     * The hash algorithm used is SHA-1
-     *
-     * Important to note here is that this method can take some time an should not be executed
-     * in the thread that handles GUI.
-     *
-     *
-     * @param uuid The uuid of the registered user
-     * @param path The path of the request
-     * @param powDifficulty The number of leading zeroes the pow has to have
-     * @return A string representing the generated pow
-     * @throws NoSuchAlgorithmException
-     * @throws UnsupportedEncodingException
-     */
-    public static String generatePow(String uuid, String path, int powDifficulty) throws Exception {
-        int salt = 0;
-        int timeStamp = (int) (System.currentTimeMillis() / 1000L);
-        String stringToHash = timeStamp
-                + ":" + uuid
-                + ":" + path
-                + ":" + "1234"; // Extra two bytes at the end i.e a salt
-
-        byte [] bytesToHash = stringToHash.getBytes(Charset.forName(UTF8_ENCODING));
-        int stringLength = stringToHash.length();
-        int bytesToHashLength = bytesToHash.length;
-
-        MessageDigest md = MessageDigest.getInstance("SHA-1");
-        md.update(bytesToHash, 0, stringLength);
-        byte[] sha1hash = md.digest();
-
-        while(!validPow(sha1hash, powDifficulty)) {
-            salt++;
-            bytesToHash[bytesToHashLength-1] = (byte) (59 + salt%68);
-            bytesToHash[bytesToHashLength-2] = (byte) (59 + (salt >>> 8)%68);
-            bytesToHash[bytesToHashLength-3] = (byte) (127 - (salt >>> 16)%68);
-            bytesToHash[bytesToHashLength-4] = (byte) (127 - (salt >>> 24)%68);
-
-            md.update(bytesToHash, 0, stringToHash.length());
-            sha1hash = md.digest();
-        }
-
-        String hash = bytesToHex(sha1hash);
-        return  new String(bytesToHash, UTF8_ENCODING)
-                + ":" + hash;
-    }
-
-    /**
-     * A method for checking if the POW generated is valid. A valid hash has a number of
-     * leading zeroes specified in the input parameter powDifficulty
-     *
-     * @param hash The hash to validate
-     * @param powDifficulty An int saying how many leading zeroes the hash has to have in order
-     *                      to be seen as a valid hash
-     * @return A boolean indicating whether the hash inputted is valid of not.
-     */
-    private static boolean validPow(byte [] hash, int powDifficulty) {
-
-        for(int i = 0; i < powDifficulty; i++) {
-            byte byteToCheck = hash[i/8];
-            byte mask = (byte) (-128 >> i%8);
-            int maskByteToCheck = byteToCheck & mask;
-
-            if(maskByteToCheck != 0) {
-                return false;
-            }
-
-        }
-
-        return true;
-    }
 }

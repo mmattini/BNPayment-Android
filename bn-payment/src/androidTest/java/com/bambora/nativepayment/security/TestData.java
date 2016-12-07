@@ -1,4 +1,28 @@
+/*
+ * Copyright (c) 2016 Bambora ( http://bambora.com/ )
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 package com.bambora.nativepayment.security;
+
+import android.content.Context;
 
 import com.bambora.nativepayment.utils.CertificateUtils;
 
@@ -7,26 +31,21 @@ import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * TODO
+ * Test data for instrumented tests.
  */
 public class TestData {
 
-    private static final String KEY_STORE_TYPE =        "PKCS12";
-    private static final String KEY_STORE_PASSWORD =    "1234";
-    private static final String KEY_ALIAS =             "1";
-    private static final String KEY_PASSWORD =          "1234";
+    private static final String FILE_TEST_PRIVATE_KEY = "TestPKCS.p12";
+    private static final String KEY_STORE_TYPE = "PKCS12";
+    private static final String KEY_STORE_PASSWORD = "1234";
+    private static final String KEY_ALIAS = "e45099016624513f8fef3a0da2b2ca95628adec8";
+    private static final String KEY_PASSWORD = "1234";
 
-    private static final String PATH_ROOT_CA_CERT =             "rootCACert.pem";
-    private static final String PATH_ROOT_CA_SIGNED_CERT =      "rootCASignedCert.pem";
-    private static final String PATH_VALID_SIGNED_CHAIN =       "validSignedCertChain.pem";
-    private static final String PATH_INVALID_CERTIFICATE =      "invalidCert.cer";
-
-    private static final String PATH_TEST_PRIVATE_KEY = "TestPKCS.p12";
     private static final String PUBLIC_TEST_CERT_AS_STRING =
                     "-----BEGIN CERTIFICATE-----\n" +
                     "MIIFYjCCA0oCCQDgdWrZfzM9JzANBgkqhkiG9w0BAQUFADBzMQswCQYDVQQGEwJT\n" +
@@ -60,8 +79,8 @@ public class TestData {
                     "jCgvIXX2q+5rAsyX9R0AgpWzk9yyACL5INq7AvCLIBrxCsF2HOc=\n" +
                     "-----END CERTIFICATE-----\n";
 
-    public static KeyPair getKeyPairFromRSAKeystore(ClassLoader classLoader) throws Exception {
-        KeyStore keyStore = loadTestKeyStore(classLoader);
+    public static KeyPair getKeyPairFromRSAKeystore(Context context) throws Exception {
+        KeyStore keyStore = loadTestKeyStore(context);
         PublicKey publicKey = keyStore.getCertificate(KEY_ALIAS).getPublicKey();
         PrivateKey privateKey = (PrivateKey) keyStore.getKey(KEY_ALIAS, KEY_PASSWORD.toCharArray());
         return new KeyPair(publicKey, privateKey);
@@ -71,26 +90,16 @@ public class TestData {
         return PUBLIC_TEST_CERT_AS_STRING;
     }
 
-    public static Certificate getValidEncryptionCertificate(ClassLoader classLoader) throws CertificateException {
-        return CertificateUtils.loadCertificateFromResources(classLoader, PATH_ROOT_CA_SIGNED_CERT);
+    public static List<EncryptionCertificate> getTestEncryptionCerts() {
+        List<EncryptionCertificate> certificates = new ArrayList<>();
+        X509Certificate certificate = (X509Certificate) CertificateUtils.parseCertificate(getCertificateFromString());
+        X509Certificate[] certificateArray = { certificate };
+        certificates.add(new EncryptionCertificate("TestFingerprint", certificateArray, null, 0));
+        return certificates;
     }
 
-    public static Certificate getInvalidEncryptionCertificate(ClassLoader classLoader) throws CertificateException {
-        return CertificateUtils.loadCertificateFromResources(classLoader, PATH_INVALID_CERTIFICATE);
-    }
-
-    public static X509Certificate[] getValidCertificateChain(ClassLoader classLoader) throws CertificateException {
-        X509Certificate[] x509Certificates = CertificateUtils.loadCertChainFromResources(classLoader, PATH_VALID_SIGNED_CHAIN);
-        return x509Certificates;
-    }
-
-    public static Certificate getValidMasterCertificate(ClassLoader classLoader) throws CertificateException {
-        return CertificateUtils.loadCertificateFromResources(classLoader, PATH_ROOT_CA_CERT);
-    }
-
-
-    private static KeyStore loadTestKeyStore(ClassLoader classLoader) throws Exception {
-        InputStream inputStream = classLoader.getResourceAsStream(PATH_TEST_PRIVATE_KEY);
+    private static KeyStore loadTestKeyStore(Context context) throws Exception {
+        InputStream inputStream = context.getAssets().open(FILE_TEST_PRIVATE_KEY);
         KeyStore keyStore = KeyStore.getInstance(KEY_STORE_TYPE);
         keyStore.load(inputStream, KEY_STORE_PASSWORD.toCharArray());
         inputStream.close();

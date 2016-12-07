@@ -32,16 +32,16 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * TODO
+ * Local parametrized test for the isFormatted method in the {@link FormInputHelper} class.
  */
 @RunWith(Parameterized.class)
-public class FormatInputHelperIsFormattedTest {
+public class FormatInputHelperIsFormattedLocalTest {
 
     private String sequence;
     private List<Integer> groupSizes;
     private boolean expectedResult;
 
-    public FormatInputHelperIsFormattedTest(String sequence, List<Integer> groupSizes, boolean expectedResult) {
+    public FormatInputHelperIsFormattedLocalTest(String sequence, List<Integer> groupSizes, boolean expectedResult) {
         this.sequence = sequence;
         this.groupSizes = groupSizes;
         this.expectedResult = expectedResult;
@@ -72,6 +72,7 @@ public class FormatInputHelperIsFormattedTest {
                 {"1234 123456 12345", Arrays.asList(4, 6, 5), true},
                 {"1234 123456 123456", Arrays.asList(4, 6, 5), false},
                 {"1234 123456 12345 6", Arrays.asList(4, 6, 5), true},
+                {"1234 123456 12345 6", Arrays.asList(), true}
         });
     }
 

@@ -20,24 +20,23 @@
  * THE SOFTWARE.
  */
 
-package com.bambora.nativepayment.mock;
 
-import com.bambora.nativepayment.managers.CreditCardManager;
-import com.bambora.nativepayment.models.creditcard.CreditCard;
+package com.bambora.nativepayment.handlers;
+
+import junit.framework.Assert;
+
+import org.junit.Test;
 
 /**
- * @author Lovisa Corp
+ * Local test for the {@link BNPaymentHandler} class.
  */
-public class OnCreditCardSavedMock implements CreditCardManager.IOnCreditCardSaved {
+public class BNPaymentHandlerLocalTest {
 
-    private boolean onCreditCardSavedCalled;
-
-    public boolean wasOnCreditCardSavedCalled() {
-        return onCreditCardSavedCalled;
-    }
-
-    @Override
-    public void onCreditCardSaved(CreditCard creditCard) {
-        onCreditCardSavedCalled = true;
+    @Test
+    public void testGetInstance() {
+        // When
+        BNPaymentHandler instance = BNPaymentHandler.getInstance();
+        // Then
+        Assert.assertEquals(BNPaymentHandler.class, instance.getClass());
     }
 }
