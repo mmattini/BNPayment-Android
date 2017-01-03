@@ -32,6 +32,8 @@
                 android:id="@+id/et_card_number"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/bn_standard_item_height"
+                android:nextFocusForward="@+id/et_expiry_date"
+                android:imeOptions="actionNext"
                 style="@style/BN.EditText.CardForm" />
 
             <LinearLayout
@@ -46,6 +48,8 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:layout_marginRight="1dp"
+                    android:nextFocusForward="@+id/et_security_code"
+                    android:imeOptions="actionNext"
                     style="@style/BN.EditText.CardForm" />
 
                 <com.bambora.nativepayment.widget.edittext.SecurityCodeEditText
@@ -53,6 +57,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
+                    android:imeOptions="actionDone"
                     style="@style/BN.EditText.CardForm" />
 
             </LinearLayout>
