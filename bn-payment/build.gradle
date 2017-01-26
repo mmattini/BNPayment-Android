@@ -5,12 +5,12 @@ plugins {
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.3"
+    compileSdkVersion 25
+    buildToolsVersion "25.0.1"
 
     defaultConfig {
         minSdkVersion 10
-        targetSdkVersion 23
+        targetSdkVersion 25
         versionCode = System.getenv("BUILD_NUMBER") as Integer ?: 0
         versionName System.getenv("LIBRARY_VERSION") ?: '0.0.0'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -28,7 +28,7 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:23.3.0'
+    compile 'com.android.support:appcompat-v7:25.1.0'
     compile 'commons-codec:commons-codec:1.9'
     testCompile 'commons-codec:commons-codec:1.9'
     testCompile 'junit:junit:4.12'
