@@ -37,14 +37,13 @@ import com.bambora.nativepayment.network.HttpClient;
 import com.bambora.nativepayment.network.Request;
 import com.bambora.nativepayment.services.PaymentApiService;
 import com.bambora.nativepayment.services.PaymentApiService.PaymentService;
+import com.threatmetrix.TrustDefender.TrustDefender;
 
 import java.lang.reflect.Constructor;
 
 /**
  * {@link BNPaymentHandler} handles the responsibilities of managing the authentication and
  * service creation. <br><br>
- * <p/>
- * Created by oskarhenriksson on 14/10/15.
  */
 
 public class BNPaymentHandler {
@@ -117,6 +116,8 @@ public class BNPaymentHandler {
                 ourInstance.mHttpClient = new BNHttpClient(builder.context, builder.apiToken);
             } else {
                 ourInstance.mHttpClient = new BNHttpClient(builder.merchantAccount);
+                TrustDefenderHandler.getInstance().
+                        setupTrustDefender(builder.merchantAccount, builder.context, TrustDefender.getInstance());
             }
             ourInstance.certificateManager.getEncryptionCertificates(builder.context, null);
         }

@@ -24,6 +24,7 @@ dependencies {
     compile project(':bn-payment')
     compile 'com.android.support:appcompat-v7:25.1.0'
     compile 'com.android.support:design:25.1.0'
+    compile 'com.squareup.okhttp3:okhttp:3.6.0'
 }
 
 apply plugin: 'com.getkeepsafe.dexcount'
