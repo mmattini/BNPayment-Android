@@ -24,6 +24,8 @@ package com.bambora.nativepayment.network;
 
 import android.content.Context;
 
+import com.bambora.nativepayment.handlers.TrustDefenderHandler;
+
 /**
  * {@link BNHttpClient} is used for customizing requests to the Bambora API. The main purpose
  * is adding a merchant account or an API token to the request. This is required in order to
@@ -83,5 +85,9 @@ public class BNHttpClient extends HttpClient {
         if (mMerchantAccount != null && !"".equals(mMerchantAccount)) {
             request.header("Merchant-Account", mMerchantAccount);
         }
+        if (TrustDefenderHandler.getInstance().getSessionId() != null) {
+            request.header("TM-Session-Id", TrustDefenderHandler.getInstance().getSessionId());
+        }
     }
+
 }
