@@ -64,6 +64,9 @@ public class MainActivity extends AppCompatActivity {
                 .merchantAccount(MERCHANT_ACCOUNT)
                 .debug(true);
 
+        //[[oz]]
+        BNPaymentBuilder = BNPaymentBuilder.baseUrl("https://devsandbox.ippayments.com.au/rapi/");
+
         BNPaymentHandler.setupBNPayments(BNPaymentBuilder);
         setupView();
     }
