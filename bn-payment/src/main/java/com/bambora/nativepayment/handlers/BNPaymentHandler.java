@@ -38,6 +38,8 @@ import com.bambora.nativepayment.network.Request;
 import com.bambora.nativepayment.services.PaymentApiService;
 import com.bambora.nativepayment.services.PaymentApiService.PaymentService;
 
+import org.json.JSONObject;
+
 import java.lang.reflect.Constructor;
 
 /**
@@ -89,6 +91,16 @@ public class BNPaymentHandler {
      * Empty constructor for {@link BNPaymentHandler}
      */
     private BNPaymentHandler() {
+    }
+
+    private JSONObject registrationJsonData;
+
+    public JSONObject getRegistrationJsonData() {
+        return registrationJsonData;
+    }
+
+    public void setRegistrationJsonData(JSONObject registrationJsonData) {
+        this.registrationJsonData = registrationJsonData;
     }
 
     /**

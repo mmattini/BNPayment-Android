@@ -25,6 +25,7 @@ package com.bambora.nativepayment.models.creditcard;
 import android.content.Context;
 import android.util.Base64;
 
+import com.bambora.nativepayment.handlers.BNPaymentHandler;
 import com.bambora.nativepayment.interfaces.ICertificateLoadCallback;
 import com.bambora.nativepayment.interfaces.IJsonRequest;
 import com.bambora.nativepayment.logging.BNLog;
@@ -60,6 +61,7 @@ public class RegistrationParams implements IJsonRequest {
     private static final String KEY_ENCRYPTED_CARD = "encryptedCard";
     private static final String KEY_ENCRYPTED_SESSION_KEYS = "encryptedSessionKeys";
     private static final String KEY_BIN_NUMBER = "binNumber";
+    private static final String KEY_REGISTRATION_DATA = "registrationJsonData";
 
     private static final int BIN_NUMBER_LENGTH = 6;
 
@@ -133,6 +135,12 @@ public class RegistrationParams implements IJsonRequest {
                     sessionKeys.put(key.getJsonObject());
                 }
                 jsonObject.put(KEY_ENCRYPTED_SESSION_KEYS, sessionKeys);
+            }
+
+            JSONObject registrationJsonData = BNPaymentHandler.getInstance().getRegistrationJsonData();
+            if (registrationJsonData != null) {
+                // Should we check it is a valid JSon?
+                jsonObject.put(KEY_REGISTRATION_DATA, registrationJsonData);
             }
             jsonObject.putOpt(KEY_BIN_NUMBER, this.binNumber);
         } catch (JSONException e) {

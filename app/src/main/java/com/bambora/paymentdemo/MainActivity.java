@@ -72,6 +72,19 @@ public class MainActivity extends AppCompatActivity {
         BNPaymentBuilder = BNPaymentBuilder.baseUrl("https://devsandbox.ippayments.com.au/rapi/");
 
         BNPaymentHandler.setupBNPayments(BNPaymentBuilder);
+
+        //[[oz]]
+        /*if (BuildConfig.FLAVOR.equals("oz")) */{
+            JSONObject registrationJsonData = new JSONObject();
+            Integer registrationIntegerProperty = 4;
+            try {
+                registrationJsonData.put("StringVal", "registrationStringProperty");
+                registrationJsonData.put("IntegerVal", registrationIntegerProperty);
+                BNPaymentHandler.getInstance().setRegistrationJsonData(registrationJsonData);
+            } catch (JSONException e) {
+                BNLog.jsonParseError(getClass().getSimpleName(), e);
+            }
+        }
         setupView();
     }
 
