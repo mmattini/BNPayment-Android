@@ -35,11 +35,15 @@ import android.widget.Button;
 import com.bambora.nativepayment.handlers.BNPaymentHandler;
 import com.bambora.nativepayment.handlers.BNPaymentHandler.BNPaymentBuilder;
 import com.bambora.nativepayment.interfaces.ITransactionListener;
+import com.bambora.nativepayment.logging.BNLog;
 import com.bambora.nativepayment.managers.CreditCardManager;
 import com.bambora.nativepayment.models.PaymentSettings;
 import com.bambora.nativepayment.models.creditcard.CreditCard;
-import com.bambora.paymentdemo.adapter.CardListAdapter;
 import com.bambora.nativepayment.network.RequestError;
+import com.bambora.paymentdemo.adapter.CardListAdapter;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.Date;
 import java.util.List;
@@ -117,6 +121,19 @@ public class MainActivity extends AppCompatActivity {
         paymentSettings.currency = "SEK";
         paymentSettings.comment = "This is a test transaction.";
         paymentSettings.creditCardToken = creditCard.getCreditCardToken();
+        //[[oz]]
+        /*if (BuildConfig.FLAVOR.equals("oz")) */{
+            paymentSettings.cvcCode =  "123";
+            JSONObject paymentJsonData = new JSONObject();
+            Integer i = 4;
+            try {
+                paymentJsonData.put("StringVal", "hello");
+                paymentJsonData.put("IntegerVal", i);
+                paymentSettings.paymentJsonData = paymentJsonData;
+            } catch (JSONException e) {
+                BNLog.jsonParseError(getClass().getSimpleName(), e);
+            }
+        }
         BNPaymentHandler.getInstance().makeTransaction(paymentId, paymentSettings, new ITransactionListener() {
             @Override
             public void onTransactionSuccess() {
