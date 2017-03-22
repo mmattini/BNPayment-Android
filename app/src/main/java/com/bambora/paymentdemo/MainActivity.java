@@ -68,13 +68,9 @@ public class MainActivity extends AppCompatActivity {
                 .merchantAccount(MERCHANT_ACCOUNT)
                 .debug(true);
 
-        //[[oz]]
-        BNPaymentBuilder = BNPaymentBuilder.baseUrl("https://devsandbox.ippayments.com.au/rapi/");
+        if (BuildConfig.FLAVOR.equals("oz")){
+            BNPaymentBuilder = BNPaymentBuilder.baseUrl("https://devsandbox.ippayments.com.au/rapi/");
 
-        BNPaymentHandler.setupBNPayments(BNPaymentBuilder);
-
-        //[[oz]]
-        /*if (BuildConfig.FLAVOR.equals("oz")) */{
             JSONObject registrationJsonData = new JSONObject();
             Integer registrationIntegerProperty = 4;
             try {
@@ -85,6 +81,8 @@ public class MainActivity extends AppCompatActivity {
                 BNLog.jsonParseError(getClass().getSimpleName(), e);
             }
         }
+
+        BNPaymentHandler.setupBNPayments(BNPaymentBuilder);
         setupView();
     }
 
@@ -134,8 +132,9 @@ public class MainActivity extends AppCompatActivity {
         paymentSettings.currency = "SEK";
         paymentSettings.comment = "This is a test transaction.";
         paymentSettings.creditCardToken = creditCard.getCreditCardToken();
-        //[[oz]]
-        /*if (BuildConfig.FLAVOR.equals("oz")) */{
+
+        if (BuildConfig.FLAVOR.equals("oz")){
+            paymentSettings.currency = "AUD";
             paymentSettings.cvcCode =  "123";
             JSONObject paymentJsonData = new JSONObject();
             Integer i = 4;
