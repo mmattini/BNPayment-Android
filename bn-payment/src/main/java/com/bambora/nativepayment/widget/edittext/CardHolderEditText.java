@@ -24,23 +24,19 @@ package com.bambora.nativepayment.widget.edittext;
 
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.text.InputType;
 import android.util.AttributeSet;
 
-import com.bambora.nativepayment.utils.CompatHelper;
-import com.bambora.nativepayment.widget.CardNumberFormat;
 import com.bambora.nativepayment.widget.textwatcher.CardHolderTextWatcher;
-import com.bambora.nativepayment.widget.textwatcher.CardNumberTextWatcher.CardTypeListener;
 
 /**
  * A custom {@link android.widget.EditText} for card number input. It handles live formatting and
  * validation.
  */
-public class CardHolderEditText extends CardFormEditText implements CardTypeListener {
+public class CardHolderEditText extends CardFormEditText  {
 
-    private static final int MAX_LENGTH = 50;//[[]]z
+    private static final int MAX_LENGTH = 64;
     private static final String DEFAULT_HINT = "Card Holder Name";
 
     public CardHolderEditText(Context context) {
@@ -79,22 +75,5 @@ public class CardHolderEditText extends CardFormEditText implements CardTypeList
         return DEFAULT_HINT;
     }
 
-
-    @Override
-    public boolean isValid() {
-        String input = getText().toString();
-        return true;//[[]]z validationPattern == null || validationPattern.matcher(FormInputHelper.clearNonDigits(input)).matches();
-    }
-
-    @Override
-    public void onCardTypeChanged(CardNumberFormat cardNumberFormat) {
-        Integer iconResId = cardNumberFormat.getIconResId();
-        Drawable iconDrawable = iconResId
-                != null
-                ? CompatHelper.getDrawable(getContext(), iconResId, null)
-                : null;
-        setCompoundDrawablesWithIntrinsicBounds(null, null, iconDrawable, null);
-        setMaxLengthFilter(cardNumberFormat.getMaxInputLength());
-    }
 }
 

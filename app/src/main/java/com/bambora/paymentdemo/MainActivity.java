@@ -106,6 +106,9 @@ public class MainActivity extends AppCompatActivity {
     private void setupView() {
         Button hppButton = (Button) findViewById(R.id.hpp_button);
         hppButton.setOnClickListener(mHppButtonListener);
+        if (BuildConfig.FLAVOR.equals("oz")) {
+            hppButton.setVisibility(View.GONE);
+        }
 
         Button nativeRegistrationButton = (Button) findViewById(R.id.native_registration_button);
         nativeRegistrationButton.setOnClickListener(mNativeRegistrationButtonListener);
