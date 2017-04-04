@@ -214,7 +214,11 @@ public class RequestExecutor<T extends IJsonResponse<T>> {
             try {
                 inputStream = new BufferedInputStream(connection.getInputStream());
                 String jsonBody = readInputStream(inputStream);
-                response.setBody(jsonBody, responseBodyClass);
+                if (jsonBody == null || jsonBody.isEmpty() || "null".equalsIgnoreCase(jsonBody)){
+                    BNLog.d(LOG_TAG, "Null or emoty response body received. (" + jsonBody + ")");
+                } else {
+                    response.setBody(jsonBody, responseBodyClass);
+                }
             } catch (IOException e) {
                 BNLog.d(LOG_TAG, "No response body received. (" + e.getMessage() + ")");
             } finally {
