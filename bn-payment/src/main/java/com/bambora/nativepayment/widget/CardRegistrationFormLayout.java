@@ -39,6 +39,7 @@ import com.bambora.nativepayment.interfaces.ICardRegistrationCallback;
 import com.bambora.nativepayment.utils.CompatHelper;
 import com.bambora.nativepayment.widget.edittext.CardFormEditText;
 import com.bambora.nativepayment.widget.edittext.CardFormEditText.IOnValidationEventListener;
+import com.bambora.nativepayment.widget.edittext.CardHolderEditText;
 import com.bambora.nativepayment.widget.edittext.CardNumberEditText;
 import com.bambora.nativepayment.widget.edittext.ExpiryDateEditText;
 
@@ -51,6 +52,8 @@ import java.util.Map;
 public class CardRegistrationFormLayout extends RelativeLayout implements IOnValidationEventListener {
 
     private ICardRegistrationCallback resultListener;
+
+    private CardHolderEditText cardHolderEditText;
     private CardNumberEditText cardNumberEditText;
     private ExpiryDateEditText expiryDateEditText;
     private CardFormEditText securityCodeEditText;
@@ -105,16 +108,20 @@ public class CardRegistrationFormLayout extends RelativeLayout implements IOnVal
     private void setupView(Context context) {
         LayoutInflater inflater = LayoutInflater.from(context);
         inflater.inflate(R.layout.native_card_registration_form, this);
+        cardHolderEditText = (CardHolderEditText) findViewById(R.id.et_card_holder);
         cardNumberEditText = (CardNumberEditText) findViewById(R.id.et_card_number);
         expiryDateEditText = (ExpiryDateEditText) findViewById(R.id.et_expiry_date);
         securityCodeEditText = (CardFormEditText) findViewById(R.id.et_security_code);
+
         registrationButton = (Button) findViewById(R.id.btn_register);
         registrationButton.setOnClickListener(onRegisterButtonClickListener);
 
+        cardHolderEditText.setValidationListener(this);
         cardNumberEditText.setValidationListener(this);
         expiryDateEditText.setValidationListener(this);
         securityCodeEditText.setValidationListener(this);
 
+        inputValidStates.put(cardHolderEditText, false);
         inputValidStates.put(cardNumberEditText, false);
         inputValidStates.put(expiryDateEditText, false);
         inputValidStates.put(securityCodeEditText, false);
@@ -136,6 +143,7 @@ public class CardRegistrationFormLayout extends RelativeLayout implements IOnVal
         public void onClick(View view) {
             BNPaymentHandler.getInstance().registerCreditCard(
                     getContext(),
+                    cardHolderEditText.getText().toString(),
                     cardNumberEditText.getText().toString(),
                     expiryDateEditText.getEnteredExpiryMonth(),
                     expiryDateEditText.getEnteredExpiryYear(),
