@@ -72,10 +72,10 @@ public class MainActivity extends AppCompatActivity {
             BNPaymentBuilder = BNPaymentBuilder.baseUrl("https://devsandbox.ippayments.com.au/rapi/");
 
             JSONObject registrationJsonData = new JSONObject();
-            Integer registrationIntegerProperty = 4;
+
             try {
-                registrationJsonData.put("StringVal", "registrationStringProperty");
-                registrationJsonData.put("IntegerVal", registrationIntegerProperty);
+                registrationJsonData.put("sban", "");
+                registrationJsonData.put("pban", "62100006717");
                 BNPaymentHandler.getInstance().setRegistrationJsonData(registrationJsonData);
             } catch (JSONException e) {
                 BNLog.jsonParseError(getClass().getSimpleName(), e);
@@ -139,8 +139,14 @@ public class MainActivity extends AppCompatActivity {
             JSONObject paymentJsonData = new JSONObject();
             Integer i = 4;
             try {
-                paymentJsonData.put("StringVal", "hello");
-                paymentJsonData.put("IntegerVal", i);
+
+                paymentJsonData.put("username", "optus.rest.api.demo");
+                paymentJsonData.put("password", "afwe1834u");
+                paymentJsonData.put("pban", "62100006717");
+                paymentJsonData.put("sban", "");
+                paymentJsonData.put("velocity", "OFF");
+
+
                 paymentSettings.paymentJsonData = paymentJsonData;
             } catch (JSONException e) {
                 BNLog.jsonParseError(getClass().getSimpleName(), e);
