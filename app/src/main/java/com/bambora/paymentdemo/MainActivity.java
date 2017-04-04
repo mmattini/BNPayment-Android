@@ -54,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
      * This is a test merchant number that can be used for testing Native Payment.
      * Please replace this with your own merchant number after signing up with Bambora.
      */
+
     private static final String MERCHANT_ACCOUNT = "T638003301";
 
     @Override
@@ -69,7 +70,8 @@ public class MainActivity extends AppCompatActivity {
                 .debug(true);
 
         if (BuildConfig.FLAVOR.equals("oz")){
-            BNPaymentBuilder = BNPaymentBuilder.baseUrl("https://devsandbox.ippayments.com.au/rapi/");
+            final String OZ_MERCHANT_ACCOUNT = "02FB2CF1-A26D-432F-B70D-9BF86FD2179D";
+            BNPaymentBuilder = BNPaymentBuilder.baseUrl("https://devsandbox.ippayments.com.au/rapi/").merchantAccount(OZ_MERCHANT_ACCOUNT);
 
             JSONObject registrationJsonData = new JSONObject();
 
