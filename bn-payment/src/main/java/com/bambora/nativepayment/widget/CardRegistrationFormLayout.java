@@ -121,10 +121,10 @@ public class CardRegistrationFormLayout extends RelativeLayout implements IOnVal
         expiryDateEditText.setValidationListener(this);
         securityCodeEditText.setValidationListener(this);
 
-        inputValidStates.put(cardHolderEditText, false);
+        inputValidStates.put(cardHolderEditText, true);
         inputValidStates.put(cardNumberEditText, false);
         inputValidStates.put(expiryDateEditText, false);
-        inputValidStates.put(securityCodeEditText, false);
+        inputValidStates.put(securityCodeEditText, true);
     }
 
     private void updateButtonState() {

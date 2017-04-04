@@ -36,7 +36,7 @@ import java.util.regex.Pattern;
 public class SecurityCodeTextWatcher implements TextWatcher {
 
     private static final String FORMAT = "^\\d{1,4}$";
-    private static final String VALID_INPUT = "^\\d{3}\\d?$";
+    private static final String VALID_INPUT = "^$|^\\d{3}\\d?$";
 
     private CardInputValidator formatter;
 
