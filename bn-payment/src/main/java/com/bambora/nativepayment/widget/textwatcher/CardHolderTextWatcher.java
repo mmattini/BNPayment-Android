@@ -26,58 +26,29 @@ import android.text.Editable;
 import android.text.TextWatcher;
 
 import com.bambora.nativepayment.widget.CardInputValidator;
-import com.bambora.nativepayment.widget.CardNumberFormat;
 
 /**
  * A custom {@link TextWatcher} for formatting input as a card number.
  */
 public class CardHolderTextWatcher implements TextWatcher {
 
-    private static final char SPACE = ' ';
-
-    private CardNumberFormat numberFormat = new CardNumberFormat();
-    private boolean deleting;
-    private CharSequence deleted;
-    private int startIndex;
-
     private CardInputValidator validator;
 
     public CardHolderTextWatcher(CardInputValidator inputFormatter) {
         this.validator = inputFormatter;
-        validator.setValidationPattern(numberFormat.getValidationString());
+        validator.setValidationPattern(null);
     }
 
     @Override
     public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-        /*
-        deleting = after < count;
-        deleted = deleting ? FormInputHelper.getDeletedChars(s, start, count) : "";
-        startIndex = start;*/
     }
 
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count) {
-        //
     }
 
     @Override
     public void afterTextChanged(Editable s) {
-        /*
-        validator.setValidationPattern(numberFormat.getValidationString());
-        if (deleting && deleted.equals(String.valueOf(SPACE)) && s.length() > 0) {
-            s.delete(startIndex -1, startIndex);
-        }
-        if (!FormInputHelper.isFormatted(s.toString(), SPACE, numberFormat.getFormatGroupSizes())) {
-            CharSequence formatted = FormInputHelper.formatNumberSequence(s.toString(), numberFormat.getFormatGroupSizes(), SPACE);
-            s.replace(0, s.length(), formatted);
-        }*/
     }
 
-
-
-
-
-    public interface CardTypeListener {
-        void onCardTypeChanged(CardNumberFormat cardNumberFormat);
-    }
 }
