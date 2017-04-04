@@ -28,6 +28,14 @@
             android:padding="1dp"
             android:background="@color/bn_lighter_grey">
 
+            <com.bambora.nativepayment.widget.edittext.CardHolderEditText
+                android:id="@+id/et_card_holder"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/bn_standard_item_height"
+                android:inputType="text"
+                android:layout_marginBottom="1dp"
+                style="@style/BN.EditText.CardForm" />
+
             <com.bambora.nativepayment.widget.edittext.CardNumberEditText
                 android:id="@+id/et_card_number"
                 android:layout_width="match_parent"

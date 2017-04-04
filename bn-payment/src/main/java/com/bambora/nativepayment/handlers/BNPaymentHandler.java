@@ -157,10 +157,30 @@ public class BNPaymentHandler {
      * @param securityCode Security code such as CVC or CVV code
      * @param listener     Result listener
      */
+    //[[]]c
     public void registerCreditCard(Context context, String cardNumber, String expiryMonth, String expiryYear,
                                    String securityCode, ICardRegistrationCallback listener) {
         creditCardManager.registerCreditCard(
                 context, cardNumber, expiryMonth, expiryYear, securityCode, listener);
+    }
+
+    /**
+     * Registers a credit card for future recurring payments.
+     * <p>When the registration is completed the card is stored on disk and can be read by calling
+     * {@link #getRegisteredCreditCards(Context, CreditCardManager.IOnCreditCardRead)}.</p>
+     *
+     * @param context      App Context object
+     * @param cardHolder   Card holder
+     * @param cardNumber   Card number
+     * @param expiryMonth  Expiry month of the card
+     * @param expiryYear   Expiry year of the card
+     * @param securityCode Security code such as CVC or CVV code
+     * @param listener     Result listener
+     */
+    public void registerCreditCard(Context context, String cardHolder, String cardNumber, String expiryMonth, String expiryYear,
+                                   String securityCode, ICardRegistrationCallback listener) {
+        creditCardManager.registerCreditCard(
+                context, cardHolder, cardNumber, expiryMonth, expiryYear, securityCode, listener);
     }
 
     /**
