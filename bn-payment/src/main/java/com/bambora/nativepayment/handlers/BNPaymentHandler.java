@@ -25,6 +25,7 @@ package com.bambora.nativepayment.handlers;
 import android.content.Context;
 
 import com.bambora.nativepayment.interfaces.ICardRegistrationCallback;
+import com.bambora.nativepayment.interfaces.ITransactionExtListener;
 import com.bambora.nativepayment.interfaces.ITransactionListener;
 import com.bambora.nativepayment.logging.BNLog;
 import com.bambora.nativepayment.managers.CertificateManager;
@@ -225,6 +226,9 @@ public class BNPaymentHandler {
      */
     public Request makeTransaction(String paymentIdentifier, PaymentSettings paymentSettings, ITransactionListener callBack) {
         return PaymentService.makeTransaction(paymentIdentifier, paymentSettings, callBack);
+    }
+    public Request makeTransactionExt(String paymentIdentifier, PaymentSettings paymentSettings, ITransactionExtListener callBack) {
+        return PaymentService.makeTransactionExt(paymentIdentifier, paymentSettings, callBack);
     }
 
     /**

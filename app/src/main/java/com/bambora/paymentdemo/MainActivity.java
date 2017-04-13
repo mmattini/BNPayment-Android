@@ -34,7 +34,7 @@ import android.widget.Button;
 
 import com.bambora.nativepayment.handlers.BNPaymentHandler;
 import com.bambora.nativepayment.handlers.BNPaymentHandler.BNPaymentBuilder;
-import com.bambora.nativepayment.interfaces.ITransactionListener;
+import com.bambora.nativepayment.interfaces.ITransactionExtListener;
 import com.bambora.nativepayment.logging.BNLog;
 import com.bambora.nativepayment.managers.CreditCardManager;
 import com.bambora.nativepayment.models.PaymentSettings;
@@ -47,6 +47,7 @@ import org.json.JSONObject;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -145,8 +146,8 @@ public class MainActivity extends AppCompatActivity {
             Integer i = 4;
             try {
 
-                paymentJsonData.put("username", "optus.rest.api.demo");
-                paymentJsonData.put("password", "afwe1834u");
+                paymentJsonData.put("username", "bn-optus.rest.api.dev");
+                paymentJsonData.put("password", "MobileIsGr8");
                 paymentJsonData.put("pban", "62100006717");
                 paymentJsonData.put("sban", "");
                 paymentJsonData.put("velocity", "OFF");
@@ -157,10 +158,11 @@ public class MainActivity extends AppCompatActivity {
                 BNLog.jsonParseError(getClass().getSimpleName(), e);
             }
         }
-        BNPaymentHandler.getInstance().makeTransaction(paymentId, paymentSettings, new ITransactionListener() {
+        BNPaymentHandler.getInstance().makeTransactionExt(paymentId, paymentSettings, new ITransactionExtListener() {
             @Override
-            public void onTransactionSuccess() {
-                showDialog("Success", "The payment succeeded.");
+            public void onTransactionSuccess(Map<String, String> responseDictionary) {
+                String receipt = responseDictionary.get("receipt");
+                showDialog("Success", "The payment succeeded. Recept: " + (receipt != null?receipt:"?"));
             }
 
             @Override

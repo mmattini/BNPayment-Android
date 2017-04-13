@@ -24,6 +24,7 @@ package com.bambora.nativepayment.services;
 
 import com.bambora.nativepayment.handlers.BNPaymentHandler;
 import com.bambora.nativepayment.interfaces.ICardRegistrationCallback;
+import com.bambora.nativepayment.interfaces.ITransactionExtListener;
 import com.bambora.nativepayment.interfaces.ITransactionListener;
 import com.bambora.nativepayment.logging.BNLog;
 import com.bambora.nativepayment.models.PaymentSettings;
@@ -38,6 +39,9 @@ import com.bambora.nativepayment.network.Callback;
 import com.bambora.nativepayment.network.Request;
 import com.bambora.nativepayment.network.RequestError;
 import com.bambora.nativepayment.network.Response;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.bambora.nativepayment.network.RequestMethod.POST;
 
@@ -166,6 +170,32 @@ public class PaymentApiService extends ApiService {
                 public void onSuccess(Response<TransactionResponse> response) {
                     if (listener != null) {
                         listener.onTransactionSuccess();
+                    }
+                }
+
+                @Override
+                public void onError(RequestError error) {
+                    if (listener != null) {
+                        listener.onTransactionError(error);
+                    }
+                }
+            });
+            return request;
+        }
+
+        public static Request makeTransactionExt(String paymentId, PaymentSettings paymentSettings, final ITransactionExtListener listener) {
+            Request<TransactionResponse> request = createService().makeTransaction(paymentId, paymentSettings);
+            request.execute(new Callback<TransactionResponse>() {
+                @Override
+                public void onSuccess(Response<TransactionResponse> response) {
+                    if (listener != null) {
+
+                        Map<String,String> responseMap = new HashMap<String,String>();
+                        TransactionResponse transactionResponse = response.getBody();
+                        if (transactionResponse.receipt != null ){
+                            responseMap.put("receipt", transactionResponse.receipt);
+                        }
+                        listener.onTransactionSuccess(responseMap);
                     }
                 }
 

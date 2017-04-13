@@ -42,12 +42,15 @@ public class TransactionResponse implements IJsonResponse<TransactionResponse> {
     private static final String KEY_CODE = "code";
     private static final String KEY_MESSAGE = "message";
     private static final String KEY_INFO = "info";
+    private static final String KEY_RECEIPT = "receipt";
 
     public String paymentId;
 
     public Integer amount;
 
     public String currency;
+
+    public String receipt;
 
     /**
      * Error response parameters
@@ -61,6 +64,8 @@ public class TransactionResponse implements IJsonResponse<TransactionResponse> {
 
     public String errorInfo;
 
+
+
     @Override
     public TransactionResponse fromJson(JsonContainer jsonContainer) throws JSONException {
         JSONObject jsonObject = jsonContainer.getJsonObject();
@@ -71,6 +76,8 @@ public class TransactionResponse implements IJsonResponse<TransactionResponse> {
         code = JsonUtils.getIntIfExists(jsonObject, KEY_CODE);
         errorMessage = JsonUtils.getStringIfExists(jsonObject, KEY_MESSAGE);
         errorInfo = JsonUtils.getStringIfExists(jsonObject, KEY_INFO);
+
+        receipt = JsonUtils.getStringIfExists(jsonObject, KEY_RECEIPT);
         return this;
     }
 
