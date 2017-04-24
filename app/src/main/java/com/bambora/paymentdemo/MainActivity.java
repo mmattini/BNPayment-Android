@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (BuildConfig.FLAVOR.equals("oz")){
             final String OZ_MERCHANT_ACCOUNT = "02FB2CF1-A26D-432F-B70D-9BF86FD2179D";
-            BNPaymentBuilder = BNPaymentBuilder.baseUrl("https://devsandbox.ippayments.com.au/rapi/").merchantAccount(OZ_MERCHANT_ACCOUNT);
+            BNPaymentBuilder = BNPaymentBuilder.baseUrl("https://uat.ippayments.com.au/rapi/").merchantAccount(OZ_MERCHANT_ACCOUNT);
 
             JSONObject registrationJsonData = new JSONObject();
 
