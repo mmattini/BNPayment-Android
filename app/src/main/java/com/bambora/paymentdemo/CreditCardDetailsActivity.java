@@ -40,6 +40,8 @@ import com.bambora.nativepayment.models.creditcard.CreditCard;
 
 import java.io.Serializable;
 
+import static com.bambora.paymentdemo.R.id.tv_alias;
+
 /**
  * @author Lovisa Corp
  */
@@ -63,10 +65,14 @@ public class CreditCardDetailsActivity extends AppCompatActivity {
     }
 
     private void showCreditCardDetails(CreditCard creditCard) {
-        TextView aliasTextView = (TextView) findViewById(R.id.tv_alias);
+        TextView aliasTextView = (TextView) findViewById(tv_alias);
         TextView cardNumberTextView = (TextView) findViewById(R.id.tv_card_number);
+        TextView cardHolderNameTextView = (TextView) findViewById(R.id.tv_card_holder_name);
 
-        aliasTextView.setText(creditCard.getAlias() != null ? creditCard.getAlias() : "No alias");
+        String alias = creditCard.getAlias() != null ? creditCard.getAlias() : "No alias";
+        String name = creditCard.getCardHolderName() != null ? creditCard.getCardHolderName() : "";
+        aliasTextView.setText(alias );
+        cardHolderNameTextView.setText(name);
         cardNumberTextView.setText(creditCard.getTruncatedCardNumber());
     }
 

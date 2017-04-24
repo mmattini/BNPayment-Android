@@ -35,6 +35,7 @@ public class RegistrationResult {
 
     private static final String KEY_META = "meta";
     private static final String KEY_CARD_NUMBER = "truncatedcardnumber";
+    private static final String KEY_CARD_HOLDER_NAME = "cardHolderName";
     private static final String KEY_EXPIRY_MONTH = "expmonth";
     private static final String KEY_EXPIRY_YEAR = "expyear";
     private static final String KEY_PAYMENT_TYPE = "paymenttype";
@@ -51,6 +52,13 @@ public class RegistrationResult {
      * Truncated credit card number
      */
     public final String truncatedCardNumber;
+
+
+    /**
+     * Optional Card holder name
+     */
+    public final String cardHolderName;
+
 
     /**
      * Card expiry month
@@ -86,6 +94,7 @@ public class RegistrationResult {
         JSONObject metaJson = JsonUtils.getJSONObjectIfExists(jsonObject, KEY_META);
         meta = metaJson != null ? new RegistrationResultMeta(metaJson) : null;
         truncatedCardNumber = JsonUtils.getStringIfExists(jsonObject, KEY_CARD_NUMBER);
+        cardHolderName = JsonUtils.getStringIfExists(jsonObject, KEY_CARD_HOLDER_NAME);
         expiryMonth = JsonUtils.getIntIfExists(jsonObject,KEY_EXPIRY_MONTH);
         expiryYear = JsonUtils.getIntIfExists(jsonObject, KEY_EXPIRY_YEAR);
         paymentType = JsonUtils.getStringIfExists(jsonObject, KEY_PAYMENT_TYPE);

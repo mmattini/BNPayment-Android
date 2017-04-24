@@ -37,6 +37,7 @@ import java.io.Serializable;
 public class CreditCard implements Serializable, IJsonResponse<CreditCard> {
 
     private static final String KEY_RECURRING_PAYMENT_ID = "recurringPaymentID";
+    private static final String KEY_CARD_HOLDER_NAME = "cardHolderName";
     private static final String KEY_CARD_NUMBER = "cardNumber";
     private static final String KEY_CARD_TYPE = "cardType";
     private static final String KEY_EXPIRY_MONTH = "expiryMonth";
@@ -51,6 +52,11 @@ public class CreditCard implements Serializable, IJsonResponse<CreditCard> {
      * Truncated credit card number
      */
     private String truncatedCardNumber;
+
+    /**
+     * Optional Card holder name
+     */
+    private String cardHolderName;
 
     /**
      * Card expiry month
@@ -81,6 +87,7 @@ public class CreditCard implements Serializable, IJsonResponse<CreditCard> {
 
     public CreditCard(String truncatedCardNumber, Integer expiryMonth, Integer expiryYear,
                       String paymentType, String transactionId, String creditCardToken) {
+        this.cardHolderName = "";
         this.truncatedCardNumber = truncatedCardNumber;
         this.expiryMonth = expiryMonth;
         this.expiryYear = expiryYear;
@@ -92,6 +99,7 @@ public class CreditCard implements Serializable, IJsonResponse<CreditCard> {
     public CreditCard(RegistrationResult registrationResult) {
         if (registrationResult != null) {
             this.truncatedCardNumber = registrationResult.truncatedCardNumber;
+            this.cardHolderName = registrationResult.cardHolderName;
             this.expiryMonth = registrationResult.expiryMonth;
             this.expiryYear = registrationResult.expiryYear;
             this.paymentType = registrationResult.paymentType;
@@ -104,6 +112,7 @@ public class CreditCard implements Serializable, IJsonResponse<CreditCard> {
     public CreditCard fromJson(JsonContainer jsonContainer) throws JSONException {
         JSONObject jsonObject = jsonContainer.getJsonObject();
         this.creditCardToken = JsonUtils.getStringIfExists(jsonObject, KEY_RECURRING_PAYMENT_ID);
+        this.cardHolderName = JsonUtils.getStringIfExists(jsonObject, KEY_CARD_HOLDER_NAME);
         this.truncatedCardNumber = JsonUtils.getStringIfExists(jsonObject, KEY_CARD_NUMBER);
         this.paymentType = JsonUtils.getStringIfExists(jsonObject, KEY_CARD_TYPE);
         this.expiryMonth = JsonUtils.getIntIfExists(jsonObject, KEY_EXPIRY_MONTH);
@@ -121,6 +130,10 @@ public class CreditCard implements Serializable, IJsonResponse<CreditCard> {
 
     public String getTruncatedCardNumber() {
         return truncatedCardNumber;
+    }
+
+    public String getCardHolderName() {
+        return cardHolderName;
     }
 
     public Integer getExpiryMonth() {
