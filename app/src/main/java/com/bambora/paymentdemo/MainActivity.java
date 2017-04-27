@@ -78,18 +78,7 @@ public class MainActivity extends AppCompatActivity {
             String url = "https://devsandbox.ippayments.com.au/rapi/"; // "https://uat.ippayments.com.au/rapi/"
             BNPaymentBuilder = BNPaymentBuilder.baseUrl(url).merchantAccount(OZ_MERCHANT_ACCOUNT);
 
-            /*
-            JSONObject registrationJsonData = new JSONObject();
-
-            try {
-                registrationJsonData.put("sban", "");
-                registrationJsonData.put("pban", "62100006717");
-                BNPaymentHandler.getInstance().setRegistrationJsonData(registrationJsonData);
-            } catch (JSONException e) {
-                BNLog.jsonParseError(getClass().getSimpleName(), e);
-            }
-*/
-            JSONObject registrationJsonData = readJson("dataRegistration.json");
+            JSONObject registrationJsonData = readJsonFrom("dataRegistration.json");
             Log.i(getClass().getSimpleName(), registrationJsonData.toString());
             BNPaymentHandler.getInstance().setRegistrationJsonData(registrationJsonData);
         }
@@ -151,25 +140,8 @@ public class MainActivity extends AppCompatActivity {
         if (BuildConfig.FLAVOR.equals("oz")){
             paymentSettings.currency = "AUD";
             paymentSettings.cvcCode =  "123";
-            /*
-            JSONObject paymentJsonData = new JSONObject();
-            Integer i = 4;
-            try {
 
-                paymentJsonData.put("username", "bn-optus.rest.api.dev");
-                paymentJsonData.put("password", "MobileIsGr8");
-                paymentJsonData.put("pban", "62100006717");
-                paymentJsonData.put("sban", "");
-                paymentJsonData.put("velocity", "OFF");
-
-
-                paymentSettings.paymentJsonData = paymentJsonData;
-            } catch (JSONException e) {
-                BNLog.jsonParseError(getClass().getSimpleName(), e);
-            }
-            */
-
-            JSONObject paymentJsonData = readJson("dataPayment.json");
+            JSONObject paymentJsonData = readJsonFrom("dataPayment.json");
             Log.i(getClass().getSimpleName(), paymentJsonData.toString());
             paymentSettings.paymentJsonData = paymentJsonData;
         }
@@ -272,7 +244,7 @@ public class MainActivity extends AppCompatActivity {
         return json;
     }
 
-    private JSONObject readJson(String name)
+    private JSONObject readJsonFrom(String name)
     {
         try {
             JSONObject obj = new JSONObject(loadJSONFromAsset(name));
