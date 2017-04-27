@@ -28,6 +28,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -45,6 +46,8 @@ import com.bambora.paymentdemo.adapter.CardListAdapter;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -71,9 +74,11 @@ public class MainActivity extends AppCompatActivity {
                 .debug(true);
 
         if (BuildConfig.FLAVOR.equals("oz")){
-            final String OZ_MERCHANT_ACCOUNT = "02FB2CF1-A26D-432F-B70D-9BF86FD2179D";
-            BNPaymentBuilder = BNPaymentBuilder.baseUrl("https://uat.ippayments.com.au/rapi/").merchantAccount(OZ_MERCHANT_ACCOUNT);
+            final String OZ_MERCHANT_ACCOUNT = "CF3A111E-CB1A-4B98-814B-250EC4FD71E5"; //"02FB2CF1-A26D-432F-B70D-9BF86FD2179D";
+            String url = "https://devsandbox.ippayments.com.au/rapi/"; // "https://uat.ippayments.com.au/rapi/"
+            BNPaymentBuilder = BNPaymentBuilder.baseUrl(url).merchantAccount(OZ_MERCHANT_ACCOUNT);
 
+            /*
             JSONObject registrationJsonData = new JSONObject();
 
             try {
@@ -83,6 +88,10 @@ public class MainActivity extends AppCompatActivity {
             } catch (JSONException e) {
                 BNLog.jsonParseError(getClass().getSimpleName(), e);
             }
+*/
+            JSONObject registrationJsonData = readJson("dataRegistration.json");
+            Log.i(getClass().getSimpleName(), registrationJsonData.toString());
+            BNPaymentHandler.getInstance().setRegistrationJsonData(registrationJsonData);
         }
 
         BNPaymentHandler.setupBNPayments(BNPaymentBuilder);
@@ -142,6 +151,7 @@ public class MainActivity extends AppCompatActivity {
         if (BuildConfig.FLAVOR.equals("oz")){
             paymentSettings.currency = "AUD";
             paymentSettings.cvcCode =  "123";
+            /*
             JSONObject paymentJsonData = new JSONObject();
             Integer i = 4;
             try {
@@ -157,12 +167,17 @@ public class MainActivity extends AppCompatActivity {
             } catch (JSONException e) {
                 BNLog.jsonParseError(getClass().getSimpleName(), e);
             }
+            */
+
+            JSONObject paymentJsonData = readJson("dataPayment.json");
+            Log.i(getClass().getSimpleName(), paymentJsonData.toString());
+            paymentSettings.paymentJsonData = paymentJsonData;
         }
         BNPaymentHandler.getInstance().makeTransactionExt(paymentId, paymentSettings, new ITransactionExtListener() {
             @Override
             public void onTransactionSuccess(Map<String, String> responseDictionary) {
                 String receipt = responseDictionary.get("receipt");
-                showDialog("Success", "The payment succeeded. Recept: " + (receipt != null?receipt:"?"));
+                showDialog("Success", "The payment succeeded. Receipt: " + (receipt != null?receipt:"?"));
             }
 
             @Override
@@ -240,4 +255,32 @@ public class MainActivity extends AppCompatActivity {
             listCreditCards();
         }
     };
+
+    private String loadJSONFromAsset(String name) {
+        String json = null;
+        try {
+            InputStream is = getAssets().open(name);
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            is.close();
+            json = new String(buffer, "UTF-8");
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+        return json;
+    }
+
+    private JSONObject readJson(String name)
+    {
+        try {
+            JSONObject obj = new JSONObject(loadJSONFromAsset(name));
+            return obj;
+        } catch (JSONException e) {
+            BNLog.jsonParseError(getClass().getSimpleName(), e);
+        }
+        return null;
+
+    }
 }
