@@ -209,7 +209,7 @@ public class Request<T extends IJsonResponse<T>> {
      */
     @Override
     public String toString() {
-        final int maxBodySize = 500;
+        final int maxBodySize = 800;
         StringBuilder builder = new StringBuilder();
         builder
                 .append("URL: ").append(getUrl()).append("\n")

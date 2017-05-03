@@ -28,21 +28,29 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
 import com.bambora.nativepayment.handlers.BNPaymentHandler;
 import com.bambora.nativepayment.handlers.BNPaymentHandler.BNPaymentBuilder;
-import com.bambora.nativepayment.interfaces.ITransactionListener;
+import com.bambora.nativepayment.interfaces.ITransactionExtListener;
+import com.bambora.nativepayment.logging.BNLog;
 import com.bambora.nativepayment.managers.CreditCardManager;
 import com.bambora.nativepayment.models.PaymentSettings;
 import com.bambora.nativepayment.models.creditcard.CreditCard;
-import com.bambora.paymentdemo.adapter.CardListAdapter;
 import com.bambora.nativepayment.network.RequestError;
+import com.bambora.paymentdemo.adapter.CardListAdapter;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -50,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
      * This is a test merchant number that can be used for testing Native Payment.
      * Please replace this with your own merchant number after signing up with Bambora.
      */
+
     private static final String MERCHANT_ACCOUNT = "T638003301";
 
     @Override
@@ -63,6 +72,16 @@ public class MainActivity extends AppCompatActivity {
         BNPaymentBuilder BNPaymentBuilder = new BNPaymentBuilder(getApplicationContext())
                 .merchantAccount(MERCHANT_ACCOUNT)
                 .debug(true);
+
+        if (BuildConfig.FLAVOR.equals("oz")){
+            final String OZ_MERCHANT_ACCOUNT = "CF3A111E-CB1A-4B98-814B-250EC4FD71E5"; //"02FB2CF1-A26D-432F-B70D-9BF86FD2179D";
+            String url = "https://uat.ippayments.com.au/rapi/";// "https://devsandbox.ippayments.com.au/rapi/"; // "https://uat.ippayments.com.au/rapi/"
+            BNPaymentBuilder = BNPaymentBuilder.baseUrl(url).merchantAccount(OZ_MERCHANT_ACCOUNT);
+
+            JSONObject registrationJsonData = readJsonFrom("dataRegistration.json");
+            Log.i(getClass().getSimpleName(), registrationJsonData.toString());
+            BNPaymentHandler.getInstance().setRegistrationJsonData(registrationJsonData);
+        }
 
         BNPaymentHandler.setupBNPayments(BNPaymentBuilder);
         setupView();
@@ -86,6 +105,9 @@ public class MainActivity extends AppCompatActivity {
     private void setupView() {
         Button hppButton = (Button) findViewById(R.id.hpp_button);
         hppButton.setOnClickListener(mHppButtonListener);
+        if (BuildConfig.FLAVOR.equals("oz")) {
+            hppButton.setVisibility(View.GONE);
+        }
 
         Button nativeRegistrationButton = (Button) findViewById(R.id.native_registration_button);
         nativeRegistrationButton.setOnClickListener(mNativeRegistrationButtonListener);
@@ -114,10 +136,20 @@ public class MainActivity extends AppCompatActivity {
         paymentSettings.currency = "SEK";
         paymentSettings.comment = "This is a test transaction.";
         paymentSettings.creditCardToken = creditCard.getCreditCardToken();
-        BNPaymentHandler.getInstance().makeTransaction(paymentId, paymentSettings, new ITransactionListener() {
+
+        if (BuildConfig.FLAVOR.equals("oz")){
+            paymentSettings.currency = "AUD";
+            paymentSettings.cvcCode =  "123";
+
+            JSONObject paymentJsonData = readJsonFrom("dataPayment.json");
+            Log.i(getClass().getSimpleName(), paymentJsonData.toString());
+            paymentSettings.paymentJsonData = paymentJsonData;
+        }
+        BNPaymentHandler.getInstance().makeTransactionExt(paymentId, paymentSettings, new ITransactionExtListener() {
             @Override
-            public void onTransactionSuccess() {
-                showDialog("Success", "The payment succeeded.");
+            public void onTransactionSuccess(Map<String, String> responseDictionary) {
+                String receipt = responseDictionary.get("receipt");
+                showDialog("Success", "The payment succeeded. Receipt: " + (receipt != null?receipt:"?"));
             }
 
             @Override
@@ -195,4 +227,32 @@ public class MainActivity extends AppCompatActivity {
             listCreditCards();
         }
     };
+
+    private String loadJSONFromAsset(String name) {
+        String json = null;
+        try {
+            InputStream is = getAssets().open(name);
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            is.close();
+            json = new String(buffer, "UTF-8");
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+        return json;
+    }
+
+    private JSONObject readJsonFrom(String name)
+    {
+        try {
+            JSONObject obj = new JSONObject(loadJSONFromAsset(name));
+            return obj;
+        } catch (JSONException e) {
+            BNLog.jsonParseError(getClass().getSimpleName(), e);
+        }
+        return null;
+
+    }
 }

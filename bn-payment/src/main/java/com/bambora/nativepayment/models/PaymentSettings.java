@@ -40,11 +40,19 @@ public class PaymentSettings implements IJsonRequest {
     private static final String KEY_CURRENCY = "currency";
     private static final String KEY_COMMENT = "comment";
     private static final String KEY_TOKEN = "token";
+    private static final String KEY_CVC_CODE = "cvcCode";
+    private static final String KEY_PAYMENT_JSON_DATA= "paymentJsonData";
 
     public Integer amount;
     public String currency;
     public String comment;
     public String creditCardToken;
+    public String cvcCode;
+    public JSONObject paymentJsonData;
+
+    //NOTE:
+    // If 'comment' is null it will not be serialised => {"amount":100,"token":"92699060984307713","currency":"SEK"}
+    // if 'comment' is "" it will be serialised as follow => {"comment":"","amount":100,"token":"92699060984307713","currency":"SEK"}
 
     @Override
     public String getSerialized() {
@@ -54,6 +62,13 @@ public class PaymentSettings implements IJsonRequest {
             jsonObject.put(KEY_CURRENCY, currency);
             jsonObject.put(KEY_COMMENT, comment);
             jsonObject.put(KEY_TOKEN, creditCardToken);
+            if (cvcCode != null) {
+                jsonObject.put(KEY_CVC_CODE, cvcCode);
+            }
+            if (paymentJsonData != null) {
+                // Should we check it is a valid JSon?
+                jsonObject.put(KEY_PAYMENT_JSON_DATA, paymentJsonData);
+            }
         } catch (JSONException e) {
             BNLog.jsonParseError(getClass().getSimpleName(), e);
         }

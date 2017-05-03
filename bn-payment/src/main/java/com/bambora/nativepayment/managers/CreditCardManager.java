@@ -59,10 +59,40 @@ public class CreditCardManager {
      * @param securityCode  Security code (CVC/CVV)
      * @param listener      Result listener
      */
+    //[[]]c
     public void registerCreditCard(final Context context, String cardNumber, String expiryMonth, String expiryYear,
                                    String securityCode, final ICardRegistrationCallback listener) {
         final RegistrationParams params = new RegistrationParams(new Crypto(), CertificateManager.getInstance());
         params.setParametersAndEncrypt(context, cardNumber, expiryMonth, expiryYear, securityCode,
+                new IOnEncryptionListener() {
+                    @Override
+                    public void onEncryptionComplete() {
+                        registerCreditCard(context, params, listener);
+                    }
+
+                    @Override
+                    public void onEncryptionError() {
+                        if (listener != null) listener.onRegistrationError(null);
+                    }
+                });
+    }
+
+    /**
+     * Registers a credit card with the given details for future recurring payments.
+     * <p>When card has been registered a truncated version of the card is saved to disk.</p>
+     *
+     * @param context       App Context object
+     * @param cardHolder    Card holder
+     * @param cardNumber    Card number
+     * @param expiryMonth   Expiry month of the card
+     * @param expiryYear    Expiry year of the card
+     * @param securityCode  Security code (CVC/CVV)
+     * @param listener      Result listener
+     */
+    public void registerCreditCard(final Context context,  String cardHolder, String cardNumber, String expiryMonth, String expiryYear,
+                                   String securityCode, final ICardRegistrationCallback listener) {
+        final RegistrationParams params = new RegistrationParams(new Crypto(), CertificateManager.getInstance());
+        params.setParametersAndEncrypt(context, cardHolder, cardNumber, expiryMonth, expiryYear, securityCode,
                 new IOnEncryptionListener() {
                     @Override
                     public void onEncryptionComplete() {

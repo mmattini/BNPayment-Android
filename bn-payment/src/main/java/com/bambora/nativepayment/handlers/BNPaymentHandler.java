@@ -25,6 +25,7 @@ package com.bambora.nativepayment.handlers;
 import android.content.Context;
 
 import com.bambora.nativepayment.interfaces.ICardRegistrationCallback;
+import com.bambora.nativepayment.interfaces.ITransactionExtListener;
 import com.bambora.nativepayment.interfaces.ITransactionListener;
 import com.bambora.nativepayment.logging.BNLog;
 import com.bambora.nativepayment.managers.CertificateManager;
@@ -37,6 +38,8 @@ import com.bambora.nativepayment.network.HttpClient;
 import com.bambora.nativepayment.network.Request;
 import com.bambora.nativepayment.services.PaymentApiService;
 import com.bambora.nativepayment.services.PaymentApiService.PaymentService;
+
+import org.json.JSONObject;
 
 import java.lang.reflect.Constructor;
 
@@ -89,6 +92,16 @@ public class BNPaymentHandler {
      * Empty constructor for {@link BNPaymentHandler}
      */
     private BNPaymentHandler() {
+    }
+
+    private JSONObject registrationJsonData;
+
+    public JSONObject getRegistrationJsonData() {
+        return registrationJsonData;
+    }
+
+    public void setRegistrationJsonData(JSONObject registrationJsonData) {
+        this.registrationJsonData = registrationJsonData;
     }
 
     /**
@@ -145,10 +158,30 @@ public class BNPaymentHandler {
      * @param securityCode Security code such as CVC or CVV code
      * @param listener     Result listener
      */
+    //[[]]c
     public void registerCreditCard(Context context, String cardNumber, String expiryMonth, String expiryYear,
                                    String securityCode, ICardRegistrationCallback listener) {
         creditCardManager.registerCreditCard(
                 context, cardNumber, expiryMonth, expiryYear, securityCode, listener);
+    }
+
+    /**
+     * Registers a credit card for future recurring payments.
+     * <p>When the registration is completed the card is stored on disk and can be read by calling
+     * {@link #getRegisteredCreditCards(Context, CreditCardManager.IOnCreditCardRead)}.</p>
+     *
+     * @param context      App Context object
+     * @param cardHolder   Card holder
+     * @param cardNumber   Card number
+     * @param expiryMonth  Expiry month of the card
+     * @param expiryYear   Expiry year of the card
+     * @param securityCode Security code such as CVC or CVV code
+     * @param listener     Result listener
+     */
+    public void registerCreditCard(Context context, String cardHolder, String cardNumber, String expiryMonth, String expiryYear,
+                                   String securityCode, ICardRegistrationCallback listener) {
+        creditCardManager.registerCreditCard(
+                context, cardHolder, cardNumber, expiryMonth, expiryYear, securityCode, listener);
     }
 
     /**
@@ -193,6 +226,9 @@ public class BNPaymentHandler {
      */
     public Request makeTransaction(String paymentIdentifier, PaymentSettings paymentSettings, ITransactionListener callBack) {
         return PaymentService.makeTransaction(paymentIdentifier, paymentSettings, callBack);
+    }
+    public Request makeTransactionExt(String paymentIdentifier, PaymentSettings paymentSettings, ITransactionExtListener callBack) {
+        return PaymentService.makeTransactionExt(paymentIdentifier, paymentSettings, callBack);
     }
 
     /**

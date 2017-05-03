@@ -25,6 +25,7 @@ package com.bambora.nativepayment.models.creditcard;
 import android.content.Context;
 import android.util.Base64;
 
+import com.bambora.nativepayment.handlers.BNPaymentHandler;
 import com.bambora.nativepayment.interfaces.ICertificateLoadCallback;
 import com.bambora.nativepayment.interfaces.IJsonRequest;
 import com.bambora.nativepayment.logging.BNLog;
@@ -60,6 +61,7 @@ public class RegistrationParams implements IJsonRequest {
     private static final String KEY_ENCRYPTED_CARD = "encryptedCard";
     private static final String KEY_ENCRYPTED_SESSION_KEYS = "encryptedSessionKeys";
     private static final String KEY_BIN_NUMBER = "binNumber";
+    private static final String KEY_REGISTRATION_DATA = "registrationJsonData";
 
     private static final int BIN_NUMBER_LENGTH = 6;
 
@@ -91,6 +93,7 @@ public class RegistrationParams implements IJsonRequest {
      * @param expiryMonth   Expiry month of the card
      * @param securityCode  Security code (CVC/CVV)
      */
+    //[[]]c
     public void setParametersAndEncrypt(Context context, String cardNumber, String expiryMonth,
                                         String expiryYear, String securityCode, final IOnEncryptionListener listener) {
         if (cardNumber != null) {
@@ -99,6 +102,47 @@ public class RegistrationParams implements IJsonRequest {
         try {
             SecretKey sessionKey = generateSessionKey();
             this.encryptedCard = new CardDetails(cardNumber, securityCode, expiryMonth, expiryYear).encrypt(sessionKey);
+            encryptSessionKey(context, sessionKey, new ISessionKeyEncryptionListener() {
+                @Override
+                public void onEncryptionComplete(List<EncryptedSessionKey> encryptedKeys) {
+                    encryptedSessionKeys = encryptedKeys;
+                    if (listener != null) listener.onEncryptionComplete();
+                }
+
+                @Override
+                public void onError() {
+                    if (listener != null) listener.onEncryptionError();
+                }
+            });
+            this.binNumber = parseBinNumber(cardNumber);
+        } catch (Exception exception) {
+            BNLog.e(getClass().getSimpleName(), "Failed to encrypt card registration parameters.", exception);
+            this.encryptedCard = null;
+            this.encryptedSessionKeys = null;
+            if (listener != null) listener.onEncryptionError();
+        }
+    }
+
+    /**
+     * Takes credit card details of the card to be registered and encrypts them.
+     * <p>A private AES key is generated with which the credit card details are encrypted. This key
+     * is then encrypted with the public keys of each PSP and added as a parameter.</p>
+     *
+     * @param context       Context object
+     * @param cardHolder    Credit card holder
+     * @param cardNumber    Credit card number
+     * @param expiryYear    Expiry year of the card
+     * @param expiryMonth   Expiry month of the card
+     * @param securityCode  Security code (CVC/CVV)
+     */
+    public void setParametersAndEncrypt(Context context, String cardHolder, String cardNumber, String expiryMonth,
+                                        String expiryYear, String securityCode, final IOnEncryptionListener listener) {
+        if (cardNumber != null) {
+            cardNumber = StringUtils.stripAllNonDigits(cardNumber);
+        }
+        try {
+            SecretKey sessionKey = generateSessionKey();
+            this.encryptedCard = new CardDetails(cardHolder, cardNumber, securityCode, expiryMonth, expiryYear).encrypt(sessionKey);
             encryptSessionKey(context, sessionKey, new ISessionKeyEncryptionListener() {
                 @Override
                 public void onEncryptionComplete(List<EncryptedSessionKey> encryptedKeys) {
@@ -133,6 +177,12 @@ public class RegistrationParams implements IJsonRequest {
                     sessionKeys.put(key.getJsonObject());
                 }
                 jsonObject.put(KEY_ENCRYPTED_SESSION_KEYS, sessionKeys);
+            }
+
+            JSONObject registrationJsonData = BNPaymentHandler.getInstance().getRegistrationJsonData();
+            if (registrationJsonData != null) {
+                // Should we check it is a valid JSon?
+                jsonObject.put(KEY_REGISTRATION_DATA, registrationJsonData);
             }
             jsonObject.putOpt(KEY_BIN_NUMBER, this.binNumber);
         } catch (JSONException e) {
@@ -204,11 +254,13 @@ public class RegistrationParams implements IJsonRequest {
      */
     public class CardDetails {
 
+        private static final String KEY_CARD_HOLDER = "cardholderName";
         private static final String KEY_CARD_NUMBER = "cardNumber";
         private static final String KEY_CVC_CODE = "cvcCode";
         private static final String KEY_EXPIRY_MONTH = "expiryMonth";
         private static final String KEY_EXPIRY_YEAR = "expiryYear";
 
+        public String cardHolder;
         public String cardNumber;
         public String securityCode;
         public String expiryMonth;
@@ -218,6 +270,14 @@ public class RegistrationParams implements IJsonRequest {
                 throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException,
                 UnsupportedEncodingException, IllegalBlockSizeException, BadPaddingException,
                 InvalidAlgorithmParameterException {
+            this("", cardNumber, securityCode, expiryMonth, expiryYear);
+        }
+
+        public CardDetails(String cardHolder, String cardNumber, String securityCode, String expiryMonth, String expiryYear)
+                throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException,
+                UnsupportedEncodingException, IllegalBlockSizeException, BadPaddingException,
+                InvalidAlgorithmParameterException {
+            this.cardHolder = cardHolder;
             this.cardNumber = cardNumber;
             this.securityCode = securityCode;
             this.expiryMonth = expiryMonth;
@@ -227,6 +287,7 @@ public class RegistrationParams implements IJsonRequest {
         public JSONObject getJsonObject() {
             JSONObject jsonObject = new JSONObject();
             try {
+                jsonObject.put(KEY_CARD_HOLDER, cardHolder);
                 jsonObject.put(KEY_CARD_NUMBER, cardNumber);
                 jsonObject.put(KEY_CVC_CODE, securityCode);
                 jsonObject.put(KEY_EXPIRY_MONTH, expiryMonth);
@@ -253,6 +314,7 @@ public class RegistrationParams implements IJsonRequest {
         public CardDetails encrypt(SecretKey privateKey) throws NoSuchPaddingException,
                 BadPaddingException, InvalidAlgorithmParameterException, NoSuchAlgorithmException,
                 IllegalBlockSizeException, UnsupportedEncodingException, InvalidKeyException {
+            cardHolder = crypto.AESEncryptAndEncode(cardHolder, privateKey);
             cardNumber = crypto.AESEncryptAndEncode(cardNumber, privateKey);
             expiryYear = crypto.AESEncryptAndEncode(expiryYear, privateKey);
             expiryMonth = crypto.AESEncryptAndEncode(expiryMonth, privateKey);

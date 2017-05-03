@@ -26,36 +26,29 @@ import android.text.Editable;
 import android.text.TextWatcher;
 
 import com.bambora.nativepayment.widget.CardInputValidator;
-import com.bambora.nativepayment.widget.FormInputHelper;
-
-import java.util.regex.Pattern;
 
 /**
- * A custom {@link TextWatcher} for formatting input as a card security code.
+ * A custom {@link TextWatcher} for formatting input as a card number.
  */
-public class SecurityCodeTextWatcher implements TextWatcher {
+public class CardHolderTextWatcher implements TextWatcher {
 
-    private static final String FORMAT = "^\\d{1,4}$";
-    private static final String VALID_INPUT = "^$|^\\d{3}\\d?$";
+    private CardInputValidator validator;
 
-    private CardInputValidator formatter;
-
-    public SecurityCodeTextWatcher(CardInputValidator inputFormatter) {
-        this.formatter = inputFormatter;
-        this.formatter.setValidationPattern(VALID_INPUT);
+    public CardHolderTextWatcher(CardInputValidator inputFormatter) {
+        this.validator = inputFormatter;
+        validator.setValidationPattern(null);
     }
 
     @Override
-    public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+    }
 
     @Override
-    public void onTextChanged(CharSequence s, int start, int before, int count) {}
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+    }
 
     @Override
     public void afterTextChanged(Editable s) {
-        if (!Pattern.compile(FORMAT).matcher(s).matches()) {
-            CharSequence sequence = FormInputHelper.clearNonDigits(s.toString());
-            s.replace(0, s.length(), sequence);
-        }
     }
+
 }

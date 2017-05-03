@@ -34,6 +34,7 @@ import java.util.List;
 public class MasterCertificates {
 
     private static final String[] MASTER_CERTIFICATES = {
+
             "-----BEGIN CERTIFICATE-----\n" +
             "MIIJnDCCBYSgAwIBAgIJANYgr/aZ63rcMA0GCSqGSIb3DQEBCwUAMFsxCzAJBgNV\n" +
             "BAYTAlNFMRIwEAYDVQQHDAlTdG9ja2hvbG0xEDAOBgNVBAoMB0JhbWJvcmExJjAk\n" +
@@ -87,7 +88,32 @@ public class MasterCertificates {
             "pNW41B3R+hX0sPtzMJqQfjVpEb5NZQrCDjECKtsrjezC78sK8nWQpQxEeLQ/Cail\n" +
             "eLWDsJXxMsN7Tw4uyknREIoIKDpQzr4iI2SL1dPXquROLhQ0dU80S7FY9BqcU1pf\n" +
             "C4yTJeJpa4x3WQmOXK8ikw==\n" +
-            "-----END CERTIFICATE-----"
+            "-----END CERTIFICATE-----",
+
+            "-----BEGIN CERTIFICATE-----\n" +
+                    "MIID5zCCAs+gAwIBAgIJAMFepyQzkC0VMA0GCSqGSIb3DQEBCwUAMIGJMQswCQYD\n" +
+                    "VQQGEwJBVTEMMAoGA1UECAwDTlNXMQ8wDQYDVQQHDAZTWURORVkxDDAKBgNVBAoM\n" +
+                    "A0lQUDEVMBMGA1UECwwMSVBQIFJlc3QgQVBJMREwDwYDVQQDDAhSRVNUIEFQSTEj\n" +
+                    "MCEGCSqGSIb3DQEJARYUY2hlbi5saW5AYmFtYm9yYS5jb20wHhcNMTcwMzAzMDMy\n" +
+                    "NDI1WhcNMTgwMzAzMDMyNDI1WjCBiTELMAkGA1UEBhMCQVUxDDAKBgNVBAgMA05T\n" +
+                    "VzEPMA0GA1UEBwwGU1lETkVZMQwwCgYDVQQKDANJUFAxFTATBgNVBAsMDElQUCBS\n" +
+                    "ZXN0IEFQSTERMA8GA1UEAwwIUkVTVCBBUEkxIzAhBgkqhkiG9w0BCQEWFGNoZW4u\n" +
+                    "bGluQGJhbWJvcmEuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA\n" +
+                    "u01ozTZy4e3Nf06nZWF5JO0SKhVlW1Wv29/LIBoEARTK9VWNqV33jo9rT6522XaA\n" +
+                    "aee9fqvH6ntCWh1240J4a2GOaA4CMMIiz5nIk6tavw7JZ6RtyGp24o2nFqPtD+Ui\n" +
+                    "aWWkTZgQJmf74r0whGXpDTMDdQCBgGZSdJ0V84jDpdu6ACkQvcI9XwNJd5WACoCp\n" +
+                    "zgohH1+rcZVYqN5TtuF1gjIkxi9UJ8VBrz+llvTJ9t1p61PJ5Kvp3IDJRmwXv0ml\n" +
+                    "58H7HzXnatBKAi/xIl7Yghb+fCEQ3OzBJZlF6fa/wGcMtEaE6SSrcedOLVY4dQQF\n" +
+                    "1XLTYW2KiSqd8Aj6sD56YwIDAQABo1AwTjAdBgNVHQ4EFgQUC5+DJBdxo3F1c05s\n" +
+                    "IYijw7WnXf4wHwYDVR0jBBgwFoAUC5+DJBdxo3F1c05sIYijw7WnXf4wDAYDVR0T\n" +
+                    "BAUwAwEB/zANBgkqhkiG9w0BAQsFAAOCAQEAkhC5KohKz7/MNEuVFrDFztzYjO3I\n" +
+                    "ZxQoa7nDc3TwO/GQUgjZ2shF+en71Ui1ejlvFylYh53f3hkX8bJ4tRt3geX4ZueW\n" +
+                    "W8YKaSJvRoMjnMckIn0ZFPa3dRDwnVjd6lLFskIjbRmNlMQ3USyYoOCiRNm8ZEHQ\n" +
+                    "FnhspggWzhp+xW617X9mB9chZx6zIW8RSKHTXOoaelHAO7aeLoLSN5PTwk2Iy/99\n" +
+                    "xDXk4zbDODrxPa0wgNkgX/xt2v5gEyWtDyVQx7b8wR6+VcnAQHC7vYJD3/OX0LhF\n" +
+                    "7/VhUyKJo76+XJoPm6gjier8ASc/Za2FWmfllPXJhxS08rYqTrEnHNU0ow==\n" +
+                    "-----END CERTIFICATE-----\n"
+
     };
 
     public static List<Certificate> getMasterCertificates() {
