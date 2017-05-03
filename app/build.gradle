@@ -17,22 +17,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
-    // [[oz]]
-    // The oz flavored app can have:
-    // - different values for: minSdkVersion, targetSdkVersion, compileSdkVersion etc
-    // - different flow (authorisathion and capture are merged)
-    // - The sample apps for both flavors can co-exist on same device
-    //
-    productFlavors {
-        oz {
-
-            applicationIdSuffix ".oz"
-        }
-        eur {
-            applicationIdSuffix ".eur"
-        }
-    }
 }
 
 dependencies {

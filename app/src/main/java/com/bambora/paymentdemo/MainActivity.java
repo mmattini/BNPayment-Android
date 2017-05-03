@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
      * Please replace this with your own merchant number after signing up with Bambora.
      */
 
-    private static final String MERCHANT_ACCOUNT = "T638003301";
+    private static final String MERCHANT_ACCOUNT = "CF3A111E-CB1A-4B98-814B-250EC4FD71E5";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,22 +68,22 @@ public class MainActivity extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
 
+        String url = "https://uat.ippayments.com.au/rapi/";// "https://devsandbox.ippayments.com.au/rapi/";
+
         // Setup BNPaymentHandler
-        BNPaymentBuilder BNPaymentBuilder = new BNPaymentBuilder(getApplicationContext())
+        BNPaymentBuilder paymentBuilder = new BNPaymentBuilder(getApplicationContext())
                 .merchantAccount(MERCHANT_ACCOUNT)
-                .debug(true);
+                .debug(true)
+                .baseUrl(url);
 
-        if (BuildConfig.FLAVOR.equals("oz")){
-            final String OZ_MERCHANT_ACCOUNT = "CF3A111E-CB1A-4B98-814B-250EC4FD71E5"; //"02FB2CF1-A26D-432F-B70D-9BF86FD2179D";
-            String url = "https://uat.ippayments.com.au/rapi/";// "https://devsandbox.ippayments.com.au/rapi/"; // "https://uat.ippayments.com.au/rapi/"
-            BNPaymentBuilder = BNPaymentBuilder.baseUrl(url).merchantAccount(OZ_MERCHANT_ACCOUNT);
+        BNPaymentHandler.setupBNPayments(paymentBuilder);
 
+        // ADD the JSON registration custom data
+        {
             JSONObject registrationJsonData = readJsonFrom("dataRegistration.json");
             Log.i(getClass().getSimpleName(), registrationJsonData.toString());
             BNPaymentHandler.getInstance().setRegistrationJsonData(registrationJsonData);
         }
-
-        BNPaymentHandler.setupBNPayments(BNPaymentBuilder);
         setupView();
     }
 
@@ -105,7 +105,10 @@ public class MainActivity extends AppCompatActivity {
     private void setupView() {
         Button hppButton = (Button) findViewById(R.id.hpp_button);
         hppButton.setOnClickListener(mHppButtonListener);
-        if (BuildConfig.FLAVOR.equals("oz")) {
+
+
+        // No HPP in APAC SDK
+        {
             hppButton.setVisibility(View.GONE);
         }
 
@@ -133,18 +136,15 @@ public class MainActivity extends AppCompatActivity {
         String paymentId = "test-payment-" + new Date().getTime();
         PaymentSettings paymentSettings = new PaymentSettings();
         paymentSettings.amount = 100;
-        paymentSettings.currency = "SEK";
         paymentSettings.comment = "This is a test transaction.";
         paymentSettings.creditCardToken = creditCard.getCreditCardToken();
+        paymentSettings.currency = "AUD";
+        paymentSettings.cvcCode =  "123";
 
-        if (BuildConfig.FLAVOR.equals("oz")){
-            paymentSettings.currency = "AUD";
-            paymentSettings.cvcCode =  "123";
+        JSONObject paymentJsonData = readJsonFrom("dataPayment.json");
+        Log.i(getClass().getSimpleName(), paymentJsonData.toString());
+        paymentSettings.paymentJsonData = paymentJsonData;
 
-            JSONObject paymentJsonData = readJsonFrom("dataPayment.json");
-            Log.i(getClass().getSimpleName(), paymentJsonData.toString());
-            paymentSettings.paymentJsonData = paymentJsonData;
-        }
         BNPaymentHandler.getInstance().makeTransactionExt(paymentId, paymentSettings, new ITransactionExtListener() {
             @Override
             public void onTransactionSuccess(Map<String, String> responseDictionary) {
